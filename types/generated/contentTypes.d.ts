@@ -497,7 +497,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     sections: Schema.Attribute.DynamicZone<['sections.project']>;
-    site: Schema.Attribute.Relation<'oneToOne', 'api::site.site'>;
+    site: Schema.Attribute.Relation<'manyToOne', 'api::site.site'>;
     slag: Schema.Attribute.UID<'title'>;
     title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
@@ -525,6 +525,7 @@ export interface ApiSiteSite extends Struct.CollectionTypeSchema {
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::site.site'> &
       Schema.Attribute.Private;
     name: Schema.Attribute.String;
+    pages: Schema.Attribute.Relation<'oneToMany', 'api::page.page'>;
     publishedAt: Schema.Attribute.DateTime;
     slag: Schema.Attribute.UID<'name'>;
     updatedAt: Schema.Attribute.DateTime;

@@ -20,6 +20,12 @@
     },
     "domain": {
       "type": "text"
+    },
+    "pages": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::page.page",
+      "mappedBy": "site"
     }
   }
 }

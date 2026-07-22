@@ -1,7 +1,12 @@
-/**
- * site router
- */
-
-import { factories } from '@strapi/strapi';
-
-export default factories.createCoreRouter('api::site.site');
+export default {
+    routes: [
+        {
+            method: 'GET',
+            path: '/site-full',
+            handler: 'site.full',
+            config: {
+                auth: false,
+            },
+        },
+    ],
+};

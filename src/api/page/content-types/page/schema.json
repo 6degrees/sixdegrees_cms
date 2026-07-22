@@ -20,8 +20,9 @@
     },
     "site": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::site.site"
+      "relation": "manyToOne",
+      "target": "api::site.site",
+      "inversedBy": "pages"
     },
     "sections": {
       "type": "dynamiczone",
