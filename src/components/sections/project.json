@@ -1,0 +1,85 @@
+{
+  "collectionName": "components_sections_projects",
+  "info": {
+    "displayName": "Project"
+  },
+  "options": {},
+  "attributes": {
+    "title_en": {
+      "type": "string"
+    },
+    "title_ar": {
+      "type": "string"
+    },
+    "client_en": {
+      "type": "string"
+    },
+    "client_ar": {
+      "type": "string"
+    },
+    "date": {
+      "type": "date"
+    },
+    "background": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "thumbnail": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "swiber": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "description_en": {
+      "type": "text"
+    },
+    "description_ar": {
+      "type": "text"
+    },
+    "category": {
+      "type": "component",
+      "component": "ui.category",
+      "repeatable": false
+    },
+    "industry": {
+      "type": "component",
+      "component": "ui.industry",
+      "repeatable": false
+    },
+    "cards": {
+      "type": "component",
+      "component": "ui.card",
+      "repeatable": true
+    },
+    "page_layout": {
+      "type": "enumeration",
+      "enum": [
+        "one",
+        "two",
+        "three",
+        "four"
+      ]
+    }
+  },
+  "config": {}
+}

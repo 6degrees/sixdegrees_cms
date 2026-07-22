@@ -1,0 +1,45 @@
+{
+  "collectionName": "components_ui_cards",
+  "info": {
+    "displayName": "Card"
+  },
+  "options": {},
+  "attributes": {
+    "title_en": {
+      "type": "string"
+    },
+    "title_ar": {
+      "type": "string"
+    },
+    "subtitle_en": {
+      "type": "text"
+    },
+    "subtitle_ar": {
+      "type": "string"
+    },
+    "description_en": {
+      "type": "text"
+    },
+    "description_ar": {
+      "type": "text"
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "layout": {
+      "type": "enumeration",
+      "default": "default",
+      "enum": [
+        "default"
+      ]
+    }
+  },
+  "config": {}
+}

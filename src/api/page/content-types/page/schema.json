@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pages",
+  "info": {
+    "singularName": "page",
+    "pluralName": "pages",
+    "displayName": "Page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "slag": {
+      "type": "uid",
+      "targetField": "title"
+    },
+    "site": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::site.site"
+    },
+    "sections": {
+      "type": "dynamiczone",
+      "components": [
+        "sections.project"
+      ]
+    }
+  }
+}
