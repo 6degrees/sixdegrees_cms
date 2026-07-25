@@ -79,6 +79,9 @@
         "three",
         "four"
       ]
+    },
+    "slug": {
+      "type": "string"
     }
   },
   "config": {}

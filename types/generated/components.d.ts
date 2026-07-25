@@ -18,6 +18,7 @@ export interface SectionsProject extends Struct.ComponentSchema {
     description_en: Schema.Attribute.Text;
     industry: Schema.Attribute.Component<'ui.industry', false>;
     page_layout: Schema.Attribute.Enumeration<['one', 'two', 'three', 'four']>;
+    slug: Schema.Attribute.String;
     swiber: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios',
       true
