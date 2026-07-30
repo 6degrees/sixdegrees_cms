@@ -27,7 +27,15 @@
     "sections": {
       "type": "dynamiczone",
       "components": [
-        "sections.project"
+        "sections.project",
+        "burooj.project",
+        "naqsh.naqsh-project",
+        "naqsh.naqsh-news",
+        "air.projects-grid",
+        "ec.spaces-grid",
+        "ec.events-grid",
+        "ec.clients-grid",
+        "ec.reviews-grid"
       ]
     }
   }

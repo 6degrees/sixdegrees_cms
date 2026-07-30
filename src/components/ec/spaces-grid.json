@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_ec_spaces_grids",
+  "info": {
+    "displayName": "spaces-grid"
+  },
+  "options": {},
+  "attributes": {
+    "spaces": {
+      "type": "component",
+      "component": "ec.ec-project",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

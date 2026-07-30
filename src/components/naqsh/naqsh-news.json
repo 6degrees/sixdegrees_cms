@@ -1,0 +1,43 @@
+{
+  "collectionName": "components_naqsh_naqsh_news",
+  "info": {
+    "displayName": "naqsh-news"
+  },
+  "options": {},
+  "attributes": {
+    "title_en": {
+      "type": "string"
+    },
+    "excerpt_en": {
+      "type": "text"
+    },
+    "content_en": {
+      "type": "text"
+    },
+    "cover_image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "category": {
+      "type": "string"
+    },
+    "date": {
+      "type": "date"
+    },
+    "tags": {
+      "type": "component",
+      "component": "naqsh.tag",
+      "repeatable": true
+    },
+    "slug": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

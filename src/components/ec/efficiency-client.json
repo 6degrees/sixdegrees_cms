@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_ec_efficiency_clients",
+  "info": {
+    "displayName": "efficiency-client"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  },
+  "config": {}
+}

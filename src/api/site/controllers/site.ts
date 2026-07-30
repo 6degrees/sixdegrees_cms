@@ -3,8 +3,9 @@ import { factories } from '@strapi/strapi';
 export default factories.createCoreController('api::site.site', ({ strapi }) => ({
 
   async full(ctx) {
+    const { slug } = ctx.query;
 
-    const site = await strapi.entityService.findMany('api::site.site', {
+    const allSites = await strapi.entityService.findMany('api::site.site', {
       populate: {
         pages: {
           populate: {
@@ -24,6 +25,78 @@ export default factories.createCoreController('api::site.site', ({ strapi }) => 
                     }
                   }
                 },
+                'burooj.project': {
+                  populate: {
+                    background: true,
+                    thumbnail: true,
+                    services: true,
+                    cards: {
+                      populate: {
+                        images: true
+                      }
+                    }
+                  }
+                },
+                'air.projects-grid': {
+                  populate: {
+                    projects: {
+                      populate: {
+                        media: true
+                      }
+                    }
+                  }
+                },
+                'ec.spaces-grid': {
+                  populate: {
+                    spaces: {
+                      populate: {
+                        image: true
+                      }
+                    }
+                  }
+                },
+                'ec.events-grid': {
+                  populate: {
+                    events: {
+                      populate: {
+                        media: true
+                      }
+                    }
+                  }
+                },
+                'ec.clients-grid': {
+                  populate: {
+                    clients: {
+                      populate: {
+                        logo: true
+                      }
+                    }
+                  }
+                },
+                'ec.reviews-grid': {
+                  populate: {
+                    reviews: true
+                  }
+                },
+                'naqsh.naqsh-project': {
+                  populate: {
+                    background: true,
+                    thumbnail: true,
+                    swiper: true,
+                    tags: true,
+                    sub_sections: {
+                      populate: {
+                        images: true
+                      }
+                    }
+                  }
+                },
+                'naqsh.naqsh-news': {
+                  populate: {
+                    cover_image: true,
+                    tags: true
+                  }
+                },
               },
             },
           },
@@ -31,7 +104,9 @@ export default factories.createCoreController('api::site.site', ({ strapi }) => 
       },
     } as any);
 
-    ctx.body = site?.[0] ?? null;
+    const site = (allSites as any[]).find((s) => s.slag === slug);
+
+    ctx.body = site ?? null;
   },
 
 }));

@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_ec_events_grids",
+  "info": {
+    "displayName": "events-grid"
+  },
+  "options": {},
+  "attributes": {
+    "events": {
+      "type": "component",
+      "component": "ec.efficiency-event",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_ec_efficiency_events",
+  "info": {
+    "displayName": "efficiency-event"
+  },
+  "options": {},
+  "attributes": {
+    "title_en": {
+      "type": "string"
+    },
+    "description_en": {
+      "type": "text"
+    },
+    "media": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  },
+  "config": {}
+}

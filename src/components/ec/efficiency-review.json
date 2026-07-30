@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_ec_efficiency_reviews",
+  "info": {
+    "displayName": "efficiency-review"
+  },
+  "options": {},
+  "attributes": {
+    "quote_en": {
+      "type": "text"
+    },
+    "reviewer_name": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

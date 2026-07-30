@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_burooj_services",
+  "info": {
+    "displayName": "services"
+  },
+  "options": {},
+  "attributes": {
+    "name_en": {
+      "type": "string"
+    },
+    "name_ar": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

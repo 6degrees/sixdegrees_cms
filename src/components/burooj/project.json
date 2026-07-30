@@ -1,0 +1,82 @@
+{
+  "collectionName": "components_burooj_projects",
+  "info": {
+    "displayName": "Burooj-Project"
+  },
+  "options": {},
+  "attributes": {
+    "title_en": {
+      "type": "string"
+    },
+    "title_ar": {
+      "type": "string"
+    },
+    "description_en": {
+      "type": "text"
+    },
+    "description_ar": {
+      "type": "text"
+    },
+    "category_en": {
+      "type": "string"
+    },
+    "category_ar": {
+      "type": "string"
+    },
+    "location_en": {
+      "type": "string"
+    },
+    "location_ar": {
+      "type": "string"
+    },
+    "year": {
+      "type": "string"
+    },
+    "client_en": {
+      "type": "string"
+    },
+    "client_ar": {
+      "type": "string"
+    },
+    "background": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "thumbnail": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "slug": {
+      "type": "string"
+    },
+    "services": {
+      "type": "component",
+      "component": "burooj.services",
+      "repeatable": true
+    },
+    "cards": {
+      "type": "component",
+      "component": "burooj.cards",
+      "repeatable": true
+    },
+    "summary_en": {
+      "type": "text"
+    },
+    "summary_ar": {
+      "type": "text"
+    }
+  },
+  "config": {}
+}

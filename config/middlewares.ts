@@ -7,7 +7,17 @@ const config: Core.Config.Middlewares = [
   'strapi::cors',
   'strapi::poweredBy',
   'strapi::query',
-  'strapi::body',
+  {
+    name: 'strapi::body',
+    config: {
+      formLimit: '500mb',
+      jsonLimit: '500mb',
+      textLimit: '500mb',
+      formidable: {
+        maxFileSize: 500 * 1024 * 1024, // 500MB
+      },
+    },
+  },
   'strapi::session',
   'strapi::favicon',
   'strapi::public',

@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_naqsh_sub_sections",
+  "info": {
+    "displayName": "sub-section"
+  },
+  "options": {},
+  "attributes": {
+    "title_en": {
+      "type": "string"
+    },
+    "description_en": {
+      "type": "text"
+    },
+    "image_position": {
+      "type": "enumeration",
+      "enum": [
+        "above",
+        "below"
+      ]
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  },
+  "config": {}
+}

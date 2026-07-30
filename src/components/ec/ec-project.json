@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_ec_ec_projects",
+  "info": {
+    "displayName": "ec-spaces"
+  },
+  "options": {},
+  "attributes": {
+    "title_en": {
+      "type": "string"
+    },
+    "description_en": {
+      "type": "text"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "shape": {
+      "type": "enumeration",
+      "enum": [
+        "square",
+        "tall"
+      ]
+    }
+  },
+  "config": {}
+}

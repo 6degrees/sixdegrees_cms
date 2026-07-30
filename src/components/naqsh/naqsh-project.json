@@ -1,0 +1,71 @@
+{
+  "collectionName": "components_naqsh_naqsh_projects",
+  "info": {
+    "displayName": "naqsh-Project"
+  },
+  "options": {},
+  "attributes": {
+    "title_en": {
+      "type": "string"
+    },
+    "clinet_en": {
+      "type": "string"
+    },
+    "year": {
+      "type": "string"
+    },
+    "Company": {
+      "type": "string"
+    },
+    "Type": {
+      "type": "string"
+    },
+    "Duration": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "component",
+      "component": "naqsh.tag",
+      "repeatable": true
+    },
+    "background": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "thumbnail": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "swiper": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "sub_sections": {
+      "type": "component",
+      "component": "naqsh.sub-section",
+      "repeatable": true
+    },
+    "slug": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_burooj_cards",
+  "info": {
+    "displayName": "cards"
+  },
+  "options": {},
+  "attributes": {
+    "description_en": {
+      "type": "text"
+    },
+    "description_ar": {
+      "type": "text"
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "image_position": {
+      "type": "enumeration",
+      "enum": [
+        "above",
+        "below"
+      ]
+    }
+  },
+  "config": {}
+}

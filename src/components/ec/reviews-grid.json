@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_ec_reviews_grids",
+  "info": {
+    "displayName": "reviews-grid"
+  },
+  "options": {},
+  "attributes": {
+    "reviews": {
+      "type": "component",
+      "component": "ec.efficiency-review",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

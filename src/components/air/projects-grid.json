@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_air_projects_grids",
+  "info": {
+    "displayName": "projects-grid"
+  },
+  "options": {},
+  "attributes": {
+    "projects": {
+      "type": "component",
+      "component": "air.burooj-air-project",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

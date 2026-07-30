@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_naqsh_tags",
+  "info": {
+    "displayName": "tag"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

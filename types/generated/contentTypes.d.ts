@@ -496,7 +496,19 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::page.page'> &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
-    sections: Schema.Attribute.DynamicZone<['sections.project']>;
+    sections: Schema.Attribute.DynamicZone<
+      [
+        'sections.project',
+        'burooj.project',
+        'naqsh.naqsh-project',
+        'naqsh.naqsh-news',
+        'air.projects-grid',
+        'ec.spaces-grid',
+        'ec.events-grid',
+        'ec.clients-grid',
+        'ec.reviews-grid',
+      ]
+    >;
     site: Schema.Attribute.Relation<'manyToOne', 'api::site.site'>;
     slag: Schema.Attribute.UID<'title'>;
     title: Schema.Attribute.String;

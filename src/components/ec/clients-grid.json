@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_ec_clients_grids",
+  "info": {
+    "displayName": "clients-grid"
+  },
+  "options": {},
+  "attributes": {
+    "clients": {
+      "type": "component",
+      "component": "ec.efficiency-client",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}
