@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: strapi-api
+  namespace: strapi-api
+  labels:
+    app: strapi-api
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: strapi-api
+
+  template:
+    metadata:
+      labels:
+        app: strapi-api
+
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+
+      serviceAccountName: default
+
+      containers:
+        - name: strapi-api
+
+          image: ghcr.io/6degrees/sixdegrees_cms:latest
+          imagePullPolicy: Always
+
+          envFrom:
+            - secretRef:
+                name: strapi-secrets
+
+          ports:
+            - containerPort: 1337
+
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+
+          readinessProbe:
+            tcpSocket:
+              port: 1337
+            initialDelaySeconds: 20
+            periodSeconds: 10
+
+          livenessProbe:
+            tcpSocket:
+              port: 1337
+            initialDelaySeconds: 30
+            periodSeconds: 20
