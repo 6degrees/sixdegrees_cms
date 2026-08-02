@@ -13,11 +13,11 @@ spec:
 
   tls:
     - hosts:
-        - strapi.6d.com
+        - strapi.6d.com.sa
       secretName: strapi-api-tls
 
   rules:
-    - host: strapi.6d.com
+    - host: strapi.6d.com.sa
       http:
         paths:
           - path: /
