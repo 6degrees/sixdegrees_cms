@@ -31,6 +31,9 @@
     "@types/react-dom": "^18",
     "typescript": "^5"
   },
+  "overrides": {
+  "@strapi/admin": "5.50.2"
+},
   "engines": {
     "node": ">=20.0.0 <=26.x.x",
     "npm": ">=6.0.0"
