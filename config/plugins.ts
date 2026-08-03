@@ -33,19 +33,13 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
   },
 email: {
   config: {
-    provider: 'nodemailer',
+    provider: '@3xweb/strapi-provider-email-resend',
     providerOptions: {
-      host: 'smtp.resend.com',
-      port: 465,
-      secure: true,
-      auth: {
-        user: 'resend',
-        pass: env('RESEND_API_KEY'),
-      },
+      apiKey: env('RESEND_API_KEY'),
     },
     settings: {
-      defaultFrom: env('SMTP_FROM', 'hello@6d.com.sa'),
-      defaultReplyTo: env('SMTP_FROM', 'hello@6d.com.sa'),
+      defaultFrom: env('SMTP_FROM'),
+      defaultReplyTo: env('SMTP_FROM'),
     },
   },
 },
