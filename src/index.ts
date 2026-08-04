@@ -1,4 +1,5 @@
 import type { Core } from '@strapi/strapi';
+import jwt from 'jsonwebtoken';
 
 export default {
   register(/* { strapi }: { strapi: Core.Strapi } */) {},
@@ -57,7 +58,7 @@ export default {
       },
     });
 
-    // فلترة صفحات Page حسب الموقع المرتبط بالمستخدم (فك التوكن يدويًا لأن ctx.state.user لسا فاضي بهالمرحلة)
+    // فلترة صفحات Page حسب الموقع المرتبط بالمستخدم (فك التوكن يدويًا عبر jsonwebtoken مباشرة)
     strapi.server.use(async (ctx, next) => {
       const isPageRequest = ctx.request.path.startsWith(
         '/content-manager/collection-types/api::page.page'
@@ -68,39 +69,42 @@ export default {
         const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
         if (token) {
-          const { payload, isValid } = strapi.admin.services.token.decodeJwtToken(token);
+          try {
+            const secret = strapi.config.get('admin.auth.secret') as string;
+            const payload = jwt.verify(token, secret) as { id?: number };
 
-          if (isValid && payload?.id) {
-            const adminUser = await strapi.db.query('admin::user').findOne({
-              where: { id: payload.id },
-              populate: ['roles'],
-            });
-
-            strapi.log.info(`[site-filter-koa] user: ${adminUser?.email}`);
-
-            const isSuperAdmin = adminUser?.roles?.some(
-              (r: any) => r.code === 'strapi-super-admin'
-            );
-
-            if (adminUser && !isSuperAdmin && adminUser.preferedLanguage) {
-              strapi.log.info(`[site-filter-koa] preferedLanguage: ${adminUser.preferedLanguage}`);
-
-              const site = await strapi.db.query('api::site.site').findOne({
-                where: { slag: adminUser.preferedLanguage },
+            if (payload?.id) {
+              const adminUser = await strapi.db.query('admin::user').findOne({
+                where: { id: payload.id },
+                populate: ['roles'],
               });
 
-              strapi.log.info(`[site-filter-koa] matched site: ${site?.id}`);
+              strapi.log.info(`[site-filter-koa] user: ${adminUser?.email}`);
 
-              if (site) {
-                ctx.query.filters = {
-                  ...((ctx.query.filters as object) || {}),
-                  site: site.id,
-                };
-                strapi.log.info(`[site-filter-koa] injected filter`);
+              const isSuperAdmin = adminUser?.roles?.some(
+                (r: any) => r.code === 'strapi-super-admin'
+              );
+
+              if (adminUser && !isSuperAdmin && adminUser.preferedLanguage) {
+                strapi.log.info(`[site-filter-koa] preferedLanguage: ${adminUser.preferedLanguage}`);
+
+                const site = await strapi.db.query('api::site.site').findOne({
+                  where: { slag: adminUser.preferedLanguage },
+                });
+
+                strapi.log.info(`[site-filter-koa] matched site: ${site?.id}`);
+
+                if (site) {
+                  ctx.query.filters = {
+                    ...((ctx.query.filters as object) || {}),
+                    site: site.id,
+                  };
+                  strapi.log.info(`[site-filter-koa] injected filter`);
+                }
               }
             }
-          } else {
-            strapi.log.info('[site-filter-koa] invalid token');
+          } catch (err) {
+            strapi.log.info(`[site-filter-koa] token verify failed: ${(err as Error).message}`);
           }
         } else {
           strapi.log.info('[site-filter-koa] no auth header');
