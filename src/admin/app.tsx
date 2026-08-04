@@ -31,6 +31,31 @@ function watchAndFixTitle() {
   }
 }
 
+function forceDarkTheme() {
+  try {
+    const stored = localStorage.getItem('STRAPI_THEME');
+    console.log('🎨 Current STRAPI_THEME value:', stored);
+    if (stored !== '"dark"') {
+      localStorage.setItem('STRAPI_THEME', '"dark"');
+      console.log('🎨 Setting to dark and reloading...');
+      window.location.reload();
+    } else {
+      console.log('🎨 Already dark, no reload needed');
+    }
+  } catch (e) {
+    console.log('🎨 localStorage error:', e);
+  }
+}
+
+function hideSubtitleText() {
+  const spans = document.querySelectorAll('main span');
+  spans.forEach((span) => {
+    if (span.textContent?.trim() === 'Log in to your Strapi account') {
+      (span as HTMLElement).style.display = 'none';
+    }
+  });
+}
+
 if (typeof document !== 'undefined') {
   document.documentElement.style.setProperty('--hero-bg', `url(${HeroBackground})`);
   document.title = 'Naqsh CMS';
@@ -38,38 +63,13 @@ if (typeof document !== 'undefined') {
   toggleAuthPageClass();
   forceDarkTheme();
   watchAndFixTitle();
+  hideSubtitleText();
 
   const observer = new MutationObserver(() => {
     toggleAuthPageClass();
+    hideSubtitleText();
   });
-  observer.observe(document.body, { childList: true, subtree: false });
-
-  window.addEventListener('popstate', toggleAuthPageClass);
-}
-
-function forceDarkTheme() {
-  try {
-    const stored = localStorage.getItem('STRAPI_THEME');
-    if (stored !== '"dark"') {
-      localStorage.setItem('STRAPI_THEME', '"dark"');
-      window.location.reload();
-    }
-  } catch (e) {
-    // localStorage غير متاح
-  }
-}
-
-if (typeof document !== 'undefined') {
-  document.documentElement.style.setProperty('--hero-bg', `url(${HeroBackground})`);
-  document.title = 'Naqsh CMS';
-  setFavicon(FaviconImage);
-  toggleAuthPageClass();
-  forceDarkTheme();
-
-  const observer = new MutationObserver(() => {
-    toggleAuthPageClass();
-  });
-  observer.observe(document.body, { childList: true, subtree: false });
+  observer.observe(document.body, { childList: true, subtree: true });
 
   window.addEventListener('popstate', toggleAuthPageClass);
 }
@@ -99,5 +99,6 @@ export default {
     setFavicon(FaviconImage);
     toggleAuthPageClass();
     forceDarkTheme();
+    hideSubtitleText();
   },
 };
