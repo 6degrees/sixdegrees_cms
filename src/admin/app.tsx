@@ -117,10 +117,15 @@ function forceDarkTheme() {
 }
 
 function hideSubtitleText() {
-  const spans = document.querySelectorAll('body span');
-  spans.forEach((span) => {
-    if (span.textContent?.trim() === 'Log in to your Strapi account') {
-      (span as HTMLElement).style.display = 'none';
+  const textsToHide = [
+    'Log in to your Strapi account',
+    'Credentials are only used to authenticate in Strapi. All saved data will be stored in your database.',
+  ];
+  const elements = document.querySelectorAll('body span, body p');
+  elements.forEach((el) => {
+    const text = el.textContent?.trim();
+    if (text && textsToHide.includes(text)) {
+      (el as HTMLElement).style.display = 'none';
     }
   });
 }
