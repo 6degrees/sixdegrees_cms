@@ -150,7 +150,7 @@ function forcePageListColumns() {
     const keys = Object.keys(localStorage);
     keys.forEach((key) => {
       if (key.startsWith('STRAPI_LIST_VIEW_DISPLAYED_HEADERS:api::page.page')) {
-        const desiredColumns = JSON.stringify(['id', 'title', 'site']);
+        const desiredColumns = JSON.stringify(['site']);
         if (localStorage.getItem(key) !== desiredColumns) {
           localStorage.setItem(key, desiredColumns);
         }
