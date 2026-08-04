@@ -31,11 +31,12 @@ body.naqsh-auth-page div:has(> form) {
   transform: translateY(-50%) !important;
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%) !important;
   border-radius: 20px !important;
-  overflow: hidden !important;
+  overflow-y: auto !important;
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7) !important;
   margin: 0 !important;
   max-width: 500px !important;
   width: 90% !important;
+  max-height: 85vh !important;
   z-index: 10 !important;
 }
 
@@ -53,9 +54,12 @@ body.naqsh-auth-page input {
 
 body.naqsh-auth-page a {
   color: #a5a5ff !important;
+}
+
+body.naqsh-auth-page > a {
   position: fixed !important;
-  bottom: 14% !important;
-  right: 14% !important;
+  bottom: 8% !important;
+  right: 8% !important;
   transform: translateX(50%) !important;
   z-index: 10 !important;
 }
