@@ -59,31 +59,25 @@ export default {
     });
 
     strapi.server.use(async (ctx, next) => {
-      strapi.log.info(`[debug-mw] hit path: ${ctx.request.path}`);
-
       const isPageRequest = ctx.request.path.startsWith(
         '/content-manager/collection-types/api::page.page'
       );
 
       if (isPageRequest) {
-        strapi.log.info('[debug-mw] entered isPageRequest block');
-
         try {
           const authHeader = ctx.request.header.authorization;
-          strapi.log.info(`[debug-mw] authHeader type: ${typeof authHeader}, value present: ${!!authHeader}`);
-
           const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
           if (token) {
             const secret = strapi.config.get('admin.auth.secret') as string;
-            strapi.log.info(`[debug-mw] secret present: ${!!secret}`);
+            const payload = jwt.verify(token, secret) as any;
+            strapi.log.info(`[debug-mw] full payload: ${JSON.stringify(payload)}`);
 
-            const payload = jwt.verify(token, secret) as { id?: number };
-            strapi.log.info(`[debug-mw] payload.id: ${payload?.id}`);
+            const userId = payload?.id ?? payload?.userId ?? payload?.sub;
 
-            if (payload?.id) {
+            if (userId) {
               const adminUser = await strapi.db.query('admin::user').findOne({
-                where: { id: payload.id },
+                where: { id: userId },
                 populate: ['roles'],
               });
 
@@ -111,12 +105,9 @@ export default {
                 }
               }
             }
-          } else {
-            strapi.log.info('[site-filter-koa] no auth header');
           }
         } catch (err) {
           strapi.log.error(`[debug-mw] EXCEPTION: ${(err as Error).message}`);
-          strapi.log.error((err as Error).stack || 'no stack');
         }
       }
 
