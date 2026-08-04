@@ -145,7 +145,21 @@ function positionForgotPasswordLink() {
   });
 }
 
-
+function forcePageListColumns() {
+  try {
+    const keys = Object.keys(localStorage);
+    keys.forEach((key) => {
+      if (key.startsWith('STRAPI_LIST_VIEW_DISPLAYED_HEADERS:api::page.page')) {
+        const desiredColumns = JSON.stringify(['id', 'title', 'site']);
+        if (localStorage.getItem(key) !== desiredColumns) {
+          localStorage.setItem(key, desiredColumns);
+        }
+      }
+    });
+  } catch (e) {
+    // localStorage غير متاح
+  }
+}
 
 if (typeof document !== 'undefined') {
   injectCustomStyles();
@@ -157,6 +171,7 @@ if (typeof document !== 'undefined') {
   watchAndFixTitle();
   hideSubtitleText();
   positionForgotPasswordLink();
+  forcePageListColumns();
   setTimeout(positionForgotPasswordLink, 300);
   setTimeout(positionForgotPasswordLink, 800);
   window.addEventListener('resize', positionForgotPasswordLink);
@@ -165,6 +180,7 @@ if (typeof document !== 'undefined') {
     toggleAuthPageClass();
     hideSubtitleText();
     positionForgotPasswordLink();
+    forcePageListColumns();
   });
   observer.observe(document.body, { childList: true, subtree: true });
 
@@ -199,5 +215,6 @@ export default {
     forceDarkTheme();
     hideSubtitleText();
     positionForgotPasswordLink();
+    forcePageListColumns();
   },
 };
