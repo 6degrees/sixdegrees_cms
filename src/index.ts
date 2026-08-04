@@ -58,8 +58,9 @@ export default {
       },
     });
 
-    // فلترة صفحات Page حسب الموقع المرتبط بالمستخدم (فك التوكن يدويًا عبر jsonwebtoken مباشرة)
     strapi.server.use(async (ctx, next) => {
+      strapi.log.info(`[debug-mw] hit path: ${ctx.request.path}`); // ← سطر تشخيص جديد بدون أي شرط
+
       const isPageRequest = ctx.request.path.startsWith(
         '/content-manager/collection-types/api::page.page'
       );
