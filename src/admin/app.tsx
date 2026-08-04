@@ -1,8 +1,77 @@
-import './extensions/custom.css';
 import type { StrapiApp } from '@strapi/strapi/admin';
 import Logo from './extensions/naqsh-logo.png';
 import HeroBackground from './extensions/hero-background.png';
 import FaviconImage from './extensions/naqsh-favicon.png';
+
+const customStyles = `
+body.naqsh-auth-page {
+  background-color: #000000 !important;
+  margin: 0 !important;
+  min-height: 100vh !important;
+}
+
+body.naqsh-auth-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 50%;
+  background-image: var(--hero-bg);
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  z-index: 0;
+}
+
+body.naqsh-auth-page main {
+  position: relative !important;
+  z-index: 1 !important;
+  min-height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  padding-right: 8% !important;
+}
+
+body.naqsh-auth-page main a {
+  align-self: center !important;
+  margin-top: 20px !important;
+}
+
+body.naqsh-auth-page main > div:first-child {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%) !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7) !important;
+  margin: 0 !important;
+}
+
+body.naqsh-auth-page main h1,
+body.naqsh-auth-page main p,
+body.naqsh-auth-page main label {
+  color: #ffffff !important;
+}
+
+body.naqsh-auth-page main input {
+  background-color: #2d2d2d !important;
+  border-color: #444 !important;
+  color: #ffffff !important;
+}
+
+body.naqsh-auth-page header {
+  display: none !important;
+}
+`;
+
+function injectCustomStyles() {
+  if (document.getElementById('naqsh-custom-styles')) return;
+  const styleTag = document.createElement('style');
+  styleTag.id = 'naqsh-custom-styles';
+  styleTag.textContent = customStyles;
+  document.head.appendChild(styleTag);
+}
 
 function setFavicon(url: string) {
   let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement | null;
@@ -34,16 +103,12 @@ function watchAndFixTitle() {
 function forceDarkTheme() {
   try {
     const stored = localStorage.getItem('STRAPI_THEME');
-    console.log('🎨 Current STRAPI_THEME value:', stored);
     if (stored !== '"dark"') {
       localStorage.setItem('STRAPI_THEME', '"dark"');
-      console.log('🎨 Setting to dark and reloading...');
       window.location.reload();
-    } else {
-      console.log('🎨 Already dark, no reload needed');
     }
   } catch (e) {
-    console.log('🎨 localStorage error:', e);
+    // localStorage غير متاح
   }
 }
 
@@ -57,6 +122,7 @@ function hideSubtitleText() {
 }
 
 if (typeof document !== 'undefined') {
+  injectCustomStyles();
   document.documentElement.style.setProperty('--hero-bg', `url(${HeroBackground})`);
   document.title = 'Naqsh CMS';
   setFavicon(FaviconImage);
@@ -95,6 +161,7 @@ export default {
   },
   bootstrap(app: StrapiApp) {
     console.log(app);
+    injectCustomStyles();
     document.title = 'Naqsh CMS';
     setFavicon(FaviconImage);
     toggleAuthPageClass();
