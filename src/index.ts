@@ -56,18 +56,27 @@ export default {
         }
       },
     });
+// فلترة صفحات Page حسب الموقع المرتبط بالمستخدم (فك التوكن يدويًا لأن ctx.state.user لسا فاضي بهالمرحلة)
+strapi.server.use(async (ctx, next) => {
+  const isPageRequest = ctx.request.path.startsWith(
+    '/content-manager/collection-types/api::page.page'
+  );
 
-    // فلترة صفحات Page حسب الموقع المرتبط بالمستخدم (اعتراض مباشر على مستوى Koa)
-    strapi.server.use(async (ctx, next) => {
-      const isPageRequest = ctx.request.path.startsWith(
-        '/content-manager/collection-types/api::page.page'
-      );
+  if (isPageRequest) {
+    const authHeader = ctx.request.header.authorization;
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
-      if (isPageRequest) {
-        strapi.log.info(`[site-filter-koa] path: ${ctx.request.path}`);
-        strapi.log.info(`[site-filter-koa] user: ${ctx.state.user?.email || 'no user'}`);
+    if (token) {
+      const { payload, isValid } = strapi.admin.services.token.decodeJwtToken(token);
 
-        const adminUser = ctx.state.user;
+      if (isValid && payload?.id) {
+        const adminUser = await strapi.db.query('admin::user').findOne({
+          where: { id: payload.id },
+          populate: ['roles'],
+        });
+
+        strapi.log.info(`[site-filter-koa] user: ${adminUser?.email}`);
+
         const isSuperAdmin = adminUser?.roles?.some(
           (r: any) => r.code === 'strapi-super-admin'
         );
@@ -86,12 +95,16 @@ export default {
               ...((ctx.query.filters as object) || {}),
               site: site.id,
             };
-            strapi.log.info(`[site-filter-koa] injected filter, new query: ${JSON.stringify(ctx.query)}`);
+            strapi.log.info(`[site-filter-koa] injected filter`);
           }
         }
+      } else {
+        strapi.log.info('[site-filter-koa] invalid token');
       }
+    } else {
+      strapi.log.info('[site-filter-koa] no auth header');
+    }
+  }
 
-      await next();
-    });
-  },
-};
+  await next();
+});
