@@ -57,25 +57,37 @@ export default {
       },
     });
 
-    // فلترة صفحات Page حسب الموقع المرتبط بالمستخدم (لأدوار Editor المقيّدة)
+    // فلترة صفحات Page حسب الموقع المرتبط بالمستخدم (اعتراض مباشر على مستوى Koa)
     strapi.server.use(async (ctx, next) => {
-      const isPageContentManager =
-        ctx.request.url.includes('/content-manager/collection-types/api::page.page') &&
-        ctx.state.user &&
-        ctx.state.user.preferedLanguage;
+      const isPageRequest = ctx.request.path.startsWith(
+        '/content-manager/collection-types/api::page.page'
+      );
 
-      if (isPageContentManager) {
-        const siteSlag = ctx.state.user.preferedLanguage;
-        const site = await strapi.db.query('api::site.site').findOne({
-          where: { slag: siteSlag },
-        });
+      if (isPageRequest) {
+        strapi.log.info(`[site-filter-koa] path: ${ctx.request.path}`);
+        strapi.log.info(`[site-filter-koa] user: ${ctx.state.user?.email || 'no user'}`);
 
-        if (site) {
-          ctx.query = ctx.query || {};
-          ctx.query.filters = {
-            ...((ctx.query.filters as object) || {}),
-            site: site.id,
-          };
+        const adminUser = ctx.state.user;
+        const isSuperAdmin = adminUser?.roles?.some(
+          (r: any) => r.code === 'strapi-super-admin'
+        );
+
+        if (adminUser && !isSuperAdmin && adminUser.preferedLanguage) {
+          strapi.log.info(`[site-filter-koa] preferedLanguage: ${adminUser.preferedLanguage}`);
+
+          const site = await strapi.db.query('api::site.site').findOne({
+            where: { slag: adminUser.preferedLanguage },
+          });
+
+          strapi.log.info(`[site-filter-koa] matched site: ${site?.id}`);
+
+          if (site) {
+            ctx.query.filters = {
+              ...((ctx.query.filters as object) || {}),
+              site: site.id,
+            };
+            strapi.log.info(`[site-filter-koa] injected filter, new query: ${JSON.stringify(ctx.query)}`);
+          }
         }
       }
 
