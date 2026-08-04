@@ -56,5 +56,30 @@ export default {
         }
       },
     });
+
+    // فلترة صفحات Page حسب الموقع المرتبط بالمستخدم (لأدوار Editor المقيّدة)
+    strapi.server.use(async (ctx, next) => {
+      const isPageContentManager =
+        ctx.request.url.includes('/content-manager/collection-types/api::page.page') &&
+        ctx.state.user &&
+        ctx.state.user.preferedLanguage;
+
+      if (isPageContentManager) {
+        const siteSlag = ctx.state.user.preferedLanguage;
+        const site = await strapi.db.query('api::site.site').findOne({
+          where: { slag: siteSlag },
+        });
+
+        if (site) {
+          ctx.query = ctx.query || {};
+          ctx.query.filters = {
+            ...((ctx.query.filters as object) || {}),
+            site: site.id,
+          };
+        }
+      }
+
+      await next();
+    });
   },
 };
