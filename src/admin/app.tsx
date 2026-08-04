@@ -24,42 +24,35 @@ body.naqsh-auth-page::before {
   z-index: 0;
 }
 
-body.naqsh-auth-page main {
-  position: relative !important;
-  z-index: 1 !important;
-  min-height: 100vh !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-end !important;
-  justify-content: center !important;
-  padding-right: 8% !important;
-}
-
-body.naqsh-auth-page main a {
-  align-self: center !important;
-  margin-top: 20px !important;
-}
-
-body.naqsh-auth-page main > div:first-child {
+body.naqsh-auth-page div:has(> form) {
+  position: fixed !important;
+  top: 50% !important;
+  right: 8% !important;
+  transform: translateY(-50%) !important;
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%) !important;
   border-radius: 20px !important;
   overflow: hidden !important;
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7) !important;
   margin: 0 !important;
   max-width: 500px !important;
-  width: 100% !important;
+  width: 90% !important;
+  z-index: 10 !important;
 }
 
-body.naqsh-auth-page main h1,
-body.naqsh-auth-page main p,
-body.naqsh-auth-page main label {
+body.naqsh-auth-page h1,
+body.naqsh-auth-page p,
+body.naqsh-auth-page label {
   color: #ffffff !important;
 }
 
-body.naqsh-auth-page main input {
+body.naqsh-auth-page input {
   background-color: #2d2d2d !important;
   border-color: #444 !important;
   color: #ffffff !important;
+}
+
+body.naqsh-auth-page a {
+  color: #a5a5ff !important;
 }
 
 body.naqsh-auth-page header {
@@ -115,7 +108,7 @@ function forceDarkTheme() {
 }
 
 function hideSubtitleText() {
-  const spans = document.querySelectorAll('main span');
+  const spans = document.querySelectorAll('body span');
   spans.forEach((span) => {
     if (span.textContent?.trim() === 'Log in to your Strapi account') {
       (span as HTMLElement).style.display = 'none';
