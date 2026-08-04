@@ -46,6 +46,8 @@ body.naqsh-auth-page main > div:first-child {
   overflow: hidden !important;
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7) !important;
   margin: 0 !important;
+  max-width: 500px !important;
+  width: 100% !important;
 }
 
 body.naqsh-auth-page main h1,
