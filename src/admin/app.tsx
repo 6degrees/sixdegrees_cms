@@ -53,6 +53,11 @@ body.naqsh-auth-page input {
 
 body.naqsh-auth-page a {
   color: #a5a5ff !important;
+  position: fixed !important;
+  bottom: 14% !important;
+  right: 14% !important;
+  transform: translateX(50%) !important;
+  z-index: 10 !important;
 }
 
 body.naqsh-auth-page header {
