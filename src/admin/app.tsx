@@ -56,14 +56,6 @@ body.naqsh-auth-page a {
   color: #a5a5ff !important;
 }
 
-body.naqsh-auth-page > a {
-  position: fixed !important;
-  bottom: 8% !important;
-  right: 8% !important;
-  transform: translateX(50%) !important;
-  z-index: 10 !important;
-}
-
 body.naqsh-auth-page header {
   display: none !important;
 }
@@ -130,6 +122,31 @@ function hideSubtitleText() {
   });
 }
 
+function positionForgotPasswordLink() {
+  const links = document.querySelectorAll('a');
+  const box = document.querySelector('div:has(> form)') as HTMLElement | null;
+
+  links.forEach((link) => {
+    if (link.textContent?.trim() === 'Forgot your password?') {
+      const linkEl = link as HTMLElement;
+      linkEl.style.position = 'fixed';
+      linkEl.style.zIndex = '10';
+
+      if (box) {
+        const rect = box.getBoundingClientRect();
+        linkEl.style.top = `${rect.bottom + 20}px`;
+        linkEl.style.left = `${rect.left}px`;
+        linkEl.style.width = `${rect.width}px`;
+        linkEl.style.textAlign = 'center';
+        linkEl.style.bottom = 'auto';
+        linkEl.style.right = 'auto';
+      }
+    }
+  });
+}
+
+
+
 if (typeof document !== 'undefined') {
   injectCustomStyles();
   document.documentElement.style.setProperty('--hero-bg', `url(${HeroBackground})`);
@@ -139,10 +156,15 @@ if (typeof document !== 'undefined') {
   forceDarkTheme();
   watchAndFixTitle();
   hideSubtitleText();
+  positionForgotPasswordLink();
+  setTimeout(positionForgotPasswordLink, 300);
+  setTimeout(positionForgotPasswordLink, 800);
+  window.addEventListener('resize', positionForgotPasswordLink);
 
   const observer = new MutationObserver(() => {
     toggleAuthPageClass();
     hideSubtitleText();
+    positionForgotPasswordLink();
   });
   observer.observe(document.body, { childList: true, subtree: true });
 
@@ -176,5 +198,6 @@ export default {
     toggleAuthPageClass();
     forceDarkTheme();
     hideSubtitleText();
+    positionForgotPasswordLink();
   },
 };
