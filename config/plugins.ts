@@ -31,20 +31,30 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
       },
     },
   },
-email: {
-  config: {
-    provider: '@3xweb/strapi-provider-email-resend',
-    providerOptions: {
-      apiKey: env('RESEND_API_KEY'),
-    },
-    settings: {
-      defaultFrom: env('SMTP_FROM'),
-      defaultReplyTo: env('SMTP_FROM'),
+  email: {
+    config: {
+      provider: '@3xweb/strapi-provider-email-resend',
+      providerOptions: {
+        apiKey: env('RESEND_API_KEY'),
+      },
+      settings: {
+        defaultFrom: env('SMTP_FROM'),
+        defaultReplyTo: env('SMTP_FROM'),
+      },
     },
   },
-},
   upload: {
     config: {
+      provider: 'cloudinary',
+      providerOptions: {
+        cloud_name: env('CLOUDINARY_NAME'),
+        api_key: env('CLOUDINARY_KEY'),
+        api_secret: env('CLOUDINARY_SECRET'),
+      },
+      actionOptions: {
+        upload: {},
+        delete: {},
+      },
       sizeLimit: 500 * 1024 * 1024, // 500MB
       security: {
         allowedTypes: allowedMediaTypes,
