@@ -4,7 +4,25 @@ const config: Core.Config.Middlewares = [
   'strapi::logger',
   'strapi::errors',
   'strapi::security',
-  'strapi::cors',
+  {
+    name: 'strapi::cors',
+    config: {
+      enabled: true,
+      origin: [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:3002',
+        'http://localhost:3003',
+        'https://burooj.pro',
+        'https://buroojair.com',
+        'https://naqsh.com',
+        'https://6degrees.com.sa',
+        'https://efficiencys.com.sa',
+      ],
+      headers: '*',
+      credentials: true,
+    },
+  },
   'strapi::poweredBy',
   'strapi::query',
   {
