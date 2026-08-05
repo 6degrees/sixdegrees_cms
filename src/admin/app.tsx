@@ -96,6 +96,27 @@ function watchAndFixTitle() {
   }
 }
 
+// يجبر Strapi يقرأ "النظام Dark دائمًا" بغض النظر عن إعداد جهاز اليوزر الفعلي
+function forceDarkColorScheme() {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+  if ((window as any).__naqshMatchMediaPatched) return;
+  (window as any).__naqshMatchMediaPatched = true;
+
+  const originalMatchMedia = window.matchMedia.bind(window);
+
+  window.matchMedia = ((query: string) => {
+    const mql = originalMatchMedia(query);
+
+    if (query.includes('prefers-color-scheme: dark')) {
+      Object.defineProperty(mql, 'matches', { get: () => true, configurable: true });
+    } else if (query.includes('prefers-color-scheme: light')) {
+      Object.defineProperty(mql, 'matches', { get: () => false, configurable: true });
+    }
+
+    return mql;
+  }) as typeof window.matchMedia;
+}
+
 function forceDarkTheme() {
   try {
     const stored = localStorage.getItem('STRAPI_THEME');
@@ -162,6 +183,7 @@ function forcePageListColumns() {
 }
 
 if (typeof document !== 'undefined') {
+  forceDarkColorScheme();
   injectCustomStyles();
   document.documentElement.style.setProperty('--hero-bg', `url(${HeroBackground})`);
   document.title = 'Naqsh CMS';
@@ -208,6 +230,7 @@ export default {
   },
   bootstrap(app: StrapiApp) {
     console.log(app);
+    forceDarkColorScheme();
     injectCustomStyles();
     document.title = 'Naqsh CMS';
     setFavicon(FaviconImage);
