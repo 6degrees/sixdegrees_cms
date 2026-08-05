@@ -55,6 +55,13 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
         upload: {},
         delete: {},
       },
+      breakpoints: {
+        xlarge: 1920,
+        large: 1000,
+        medium: 750,
+        small: 500,
+        xsmall: 64,
+      },
       sizeLimit: 500 * 1024 * 1024, // 500MB
       security: {
         allowedTypes: allowedMediaTypes,
