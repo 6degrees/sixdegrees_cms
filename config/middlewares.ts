@@ -43,6 +43,7 @@ const config: Core.Config.Middlewares = [
         'https://efficiencys.com.sa',
         'https://naqsh-holding.github.io',
         'https://burooj-pro.github.io',
+        'https://efficiency-center.github.io',
       ],
       headers: '*',
       credentials: true,
