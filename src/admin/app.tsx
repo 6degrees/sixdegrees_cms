@@ -2,6 +2,7 @@ import type { StrapiApp } from '@strapi/strapi/admin';
 import Logo from './extensions/naqsh-logo.png';
 import HeroBackground from './extensions/hero-background.png';
 import FaviconImage from './extensions/naqsh-favicon.png';
+import SixDegreesLogo from './extensions/6-Degrees2.png';
 
 const customStyles = `
 body.naqsh-auth-page {
@@ -56,6 +57,8 @@ body.naqsh-auth-page a {
   color: #a5a5ff !important;
 }
 
+
+
 body.naqsh-auth-page header {
   display: none !important;
 }
@@ -82,6 +85,11 @@ function setFavicon(url: string) {
 function toggleAuthPageClass() {
   const isAuthPage = window.location.pathname.includes('/auth/');
   document.body.classList.toggle('naqsh-auth-page', isAuthPage);
+  if (isAuthPage) {
+    injectPoweredByBadge();
+  } else {
+    removePoweredByBadge();
+  }
 }
 
 function watchAndFixTitle() {
@@ -155,15 +163,44 @@ function positionForgotPasswordLink() {
 
       if (box) {
         const rect = box.getBoundingClientRect();
-        linkEl.style.top = `${rect.bottom + 20}px`;
-        linkEl.style.left = `${rect.left}px`;
-        linkEl.style.width = `${rect.width}px`;
+        linkEl.style.top = `${rect.bottom - 40}px`;
+        linkEl.style.left = `${rect.left + 40}px`;
+        linkEl.style.width = `${rect.width - 80}px`;
         linkEl.style.textAlign = 'center';
         linkEl.style.bottom = 'auto';
         linkEl.style.right = 'auto';
       }
     }
   });
+}
+
+function injectPoweredByBadge() {
+  if (document.getElementById('naqsh-powered-by')) return;
+  const badge = document.createElement('div');
+  badge.id = 'naqsh-powered-by';
+  badge.style.position = 'fixed';
+  badge.style.bottom = '20px';
+  badge.style.left = '20px';
+  badge.style.display = 'flex';
+  badge.style.flexDirection = 'row';
+  badge.style.alignItems = 'center';
+  badge.style.gap = '4px';
+  badge.style.zIndex = '20';
+  badge.style.fontSize = '16px';
+  badge.style.color = 'rgba(255,255,255,0.6)';
+  badge.innerHTML = `
+    <span>Operated by</span>
+    <img src="${SixDegreesLogo}" style="height: 40px; width: auto; display: block;" alt="6Degrees" />
+  `;
+  document.body.appendChild(badge);
+}
+
+
+
+
+function removePoweredByBadge() {
+  const badge = document.getElementById('naqsh-powered-by');
+  if (badge) badge.remove();
 }
 
 function forcePageListColumns() {
@@ -222,8 +259,8 @@ export default {
     },
     translations: {
       en: {
-        'Auth.form.welcome.title': 'Welcome to Naqsh',
-        'Auth.form.welcome.subtitle': '',
+        'Auth.form.welcome.title': 'Naqsh Holding CMS',
+        'Auth.form.welcome.subtitle': 'Centralized management for all subsidiary sites',
         'app.components.LeftMenu.navbrand.title': 'Naqsh CMS',
       },
     },
