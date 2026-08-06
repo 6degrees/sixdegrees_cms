@@ -151,12 +151,14 @@ function hideSubtitleText() {
   });
 }
 
-function positionForgotPasswordLink() {
+function positionAuthPageLinks() {
   const links = document.querySelectorAll('a');
   const box = document.querySelector('div:has(> form)') as HTMLElement | null;
+  const targetTexts = ['Forgot your password?', 'Ready to sign in?'];
 
   links.forEach((link) => {
-    if (link.textContent?.trim() === 'Forgot your password?') {
+    const text = link.textContent?.trim() || '';
+    if (targetTexts.includes(text)) {
       const linkEl = link as HTMLElement;
       linkEl.style.position = 'fixed';
       linkEl.style.zIndex = '10';
@@ -229,16 +231,16 @@ if (typeof document !== 'undefined') {
   forceDarkTheme();
   watchAndFixTitle();
   hideSubtitleText();
-  positionForgotPasswordLink();
+  positionAuthPageLinks();
   forcePageListColumns();
-  setTimeout(positionForgotPasswordLink, 300);
-  setTimeout(positionForgotPasswordLink, 800);
-  window.addEventListener('resize', positionForgotPasswordLink);
+  setTimeout(positionAuthPageLinks, 300);
+  setTimeout(positionAuthPageLinks, 800);
+  window.addEventListener('resize', positionAuthPageLinks);
 
   const observer = new MutationObserver(() => {
     toggleAuthPageClass();
     hideSubtitleText();
-    positionForgotPasswordLink();
+    positionAuthPageLinks();
     forcePageListColumns();
   });
   observer.observe(document.body, { childList: true, subtree: true });
@@ -274,7 +276,7 @@ export default {
     toggleAuthPageClass();
     forceDarkTheme();
     hideSubtitleText();
-    positionForgotPasswordLink();
+    positionAuthPageLinks();
     forcePageListColumns();
   },
 };
