@@ -1,5 +1,5 @@
 import type { StrapiApp } from '@strapi/strapi/admin';
-import Logo from './extensions/naqsh-logo.png';
+import Logo from './extensions/naqsh.png';
 import HeroBackground from './extensions/hero-background.png';
 import FaviconImage from './extensions/naqsh-favicon.png';
 import SixDegreesLogo from './extensions/6-Degrees2.png';
@@ -25,7 +25,7 @@ body.naqsh-auth-page::before {
   z-index: 0;
 }
 
-body.naqsh-auth-page div:has(> form) {
+body.naqsh-auth-page .naqsh-auth-box {
   position: fixed !important;
   top: 50% !important;
   right: 8% !important;
@@ -35,7 +35,8 @@ body.naqsh-auth-page div:has(> form) {
   overflow-y: auto !important;
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7) !important;
   margin: 0 !important;
-  max-width: 500px !important;
+  padding: 48px 56px !important;
+  max-width: 560px !important;
   width: 90% !important;
   max-height: 85vh !important;
   z-index: 10 !important;
@@ -45,6 +46,18 @@ body.naqsh-auth-page h1,
 body.naqsh-auth-page p,
 body.naqsh-auth-page label {
   color: #ffffff !important;
+}
+
+body.naqsh-auth-page .naqsh-auth-box *:not(a):not(label *) {
+  color: #ffffff !important;
+}
+
+body.naqsh-auth-page .naqsh-auth-box-wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  min-height: 0 !important;
 }
 
 body.naqsh-auth-page input {
@@ -130,11 +143,26 @@ function forceDarkTheme() {
     const stored = localStorage.getItem('STRAPI_THEME');
     if (stored !== '"dark"') {
       localStorage.setItem('STRAPI_THEME', '"dark"');
-      window.location.reload();
     }
   } catch (e) {
     // localStorage غير متاح
   }
+}
+
+// يفرض dark theme بشكل متكرر لثواني بعد أي تنقل (يغطي لحظة تسجيل الدخول)
+function persistentForceDarkTheme() {
+  forceDarkTheme();
+  let attempts = 0;
+  const interval = setInterval(() => {
+    attempts++;
+    const stored = localStorage.getItem('STRAPI_THEME');
+    if (stored !== '"dark"') {
+      localStorage.setItem('STRAPI_THEME', '"dark"');
+      // نعيد تحميل الصفحة فقط لو تغيرت القيمة فعليًا بعد ما كانت dark
+      window.location.reload();
+    }
+    if (attempts > 10) clearInterval(interval); // يوقف بعد 10 محاولات (~5 ثواني)
+  }, 500);
 }
 
 function hideSubtitleText() {
@@ -151,15 +179,48 @@ function hideSubtitleText() {
   });
 }
 
+// يحدد عنصر "الكرت" الفعلي في صفحة auth بغض النظر عن وجود form أو لا
+function findAuthBox(): HTMLElement | null {
+  // الحالة العادية: صفحات فيها form (login/register)
+  const formBox = document.querySelector('div:has(> form)') as HTMLElement | null;
+  if (formBox) return formBox;
+
+  // صفحات بدون form (forgot-password-success مثلاً): نصعد من العنوان h1
+  // لأقرب div فيه أكثر من عنصر فرعي واحد (يعني فيه محتوى فعلي، مو غلاف فاضي)
+  const h1 = document.querySelector('h1');
+  let el = h1?.parentElement as HTMLElement | null;
+  while (el && el.tagName === 'DIV' && el.children.length < 2) {
+    el = el.parentElement as HTMLElement | null;
+  }
+  return el && el.tagName === 'DIV' ? el : null;
+}
+
+function styleAuthBox() {
+  document.querySelectorAll('.naqsh-auth-box').forEach((el) => el.classList.remove('naqsh-auth-box'));
+  document.querySelectorAll('.naqsh-auth-box-wrapper').forEach((el) => el.classList.remove('naqsh-auth-box-wrapper'));
+
+  const box = findAuthBox();
+  if (box) {
+    box.classList.add('naqsh-auth-box');
+    // الأب المباشر قد يكون صندوق سترابي الافتراضي (خلفية بيضاء فاضية) - نخفي شكله فقط
+    const parent = box.parentElement;
+    if (parent && parent.tagName === 'DIV') {
+      parent.classList.add('naqsh-auth-box-wrapper');
+    }
+  }
+}
+
 function positionAuthPageLinks() {
+  styleAuthBox();
   const links = document.querySelectorAll('a');
-  const box = document.querySelector('div:has(> form)') as HTMLElement | null;
-  const targetTexts = ['Forgot your password?', 'Ready to sign in?'];
+  const box = document.querySelector('.naqsh-auth-box') as HTMLElement | null;
+  const targetTexts = ['Forgot your password?', 'Ready to sign in?', 'Sign in'];
 
   links.forEach((link) => {
     const text = link.textContent?.trim() || '';
+    const linkEl = link as HTMLElement;
+
     if (targetTexts.includes(text)) {
-      const linkEl = link as HTMLElement;
       linkEl.style.position = 'fixed';
       linkEl.style.zIndex = '10';
 
@@ -172,6 +233,18 @@ function positionAuthPageLinks() {
         linkEl.style.bottom = 'auto';
         linkEl.style.right = 'auto';
       }
+      linkEl.dataset.naqshPositioned = 'true';
+    } else if (linkEl.dataset.naqshPositioned === 'true') {
+      // كان عليه تموضع ثابت سابقًا (من صفحة/حالة قديمة) - نرجعه لوضعه الطبيعي
+      linkEl.style.position = '';
+      linkEl.style.top = '';
+      linkEl.style.left = '';
+      linkEl.style.width = '';
+      linkEl.style.textAlign = '';
+      linkEl.style.bottom = '';
+      linkEl.style.right = '';
+      linkEl.style.zIndex = '';
+      delete linkEl.dataset.naqshPositioned;
     }
   });
 }
