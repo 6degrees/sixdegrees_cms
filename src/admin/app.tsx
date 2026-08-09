@@ -358,6 +358,131 @@ function PublishedByWidgetIcon() {
   );
 }
 
+function AssignSiteWidget() {
+  const { get, post } = useFetchClient();
+  const [users, setUsers] = useState<any[]>([]);
+  const [selectedUser, setSelectedUser] = useState('');
+  const [selectedSite, setSelectedSite] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'saving' | 'done' | 'error'>('loading');
+  const [message, setMessage] = useState('');
+
+  const SITE_OPTIONS = [
+    { value: 'burooj_home', label: 'Burooj' },
+    { value: 'air_home', label: 'Burooj Air' },
+    { value: 'naqsh_home', label: 'Naqsh' },
+    { value: 'ec_home', label: 'Efficiency Center' },
+    { value: '6D_home', label: '6Degrees' },
+  ];
+
+  useEffect(() => {
+    get('/admin/users')
+      .then((res: any) => {
+        const results = res?.data?.data?.results || res?.data?.results || [];
+        setUsers(results);
+        setStatus('idle');
+      })
+      .catch(() => setStatus('error'));
+  }, []);
+
+  const handleAssign = async () => {
+    if (!selectedUser || !selectedSite) return;
+    setStatus('saving');
+    setMessage('');
+    try {
+      await post('/naqsh/assign-site', { userId: Number(selectedUser), site: selectedSite });
+      setStatus('done');
+      setMessage('Assigned successfully.');
+    } catch (err) {
+      setStatus('error');
+      setMessage('Failed to assign. Check console/logs.');
+    }
+  };
+
+  if (status === 'loading') {
+    return <div style={{ padding: '16px', opacity: 0.7 }}>Loading...</div>;
+  }
+
+  const selectStyle: React.CSSProperties = {
+    padding: '12px 14px',
+    borderRadius: '8px',
+    background: '#2d2d2d',
+    color: '#ffffff',
+    border: '1px solid #444',
+    fontSize: '14px',
+    outline: 'none',
+    appearance: 'none',
+    WebkitAppearance: 'none',
+    cursor: 'pointer',
+  };
+
+  return (
+    <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '15px' }}>
+      <select
+        value={selectedUser}
+        onChange={(e) => setSelectedUser(e.target.value)}
+        style={selectStyle}
+      >
+        <option value="">Select employee...</option>
+        {users.map((u: any) => (
+          <option key={u.id} value={u.id}>
+            {u.firstname} {u.lastname} ({u.email})
+          </option>
+        ))}
+      </select>
+
+      <select
+        value={selectedSite}
+        onChange={(e) => setSelectedSite(e.target.value)}
+        style={selectStyle}
+      >
+        <option value="">Select company...</option>
+        {SITE_OPTIONS.map((s) => (
+          <option key={s.value} value={s.value}>
+            {s.label}
+          </option>
+        ))}
+      </select>
+
+      <button
+        onClick={handleAssign}
+        disabled={!selectedUser || !selectedSite || status === 'saving'}
+        style={{
+          padding: '12px',
+          borderRadius: '8px',
+          cursor: !selectedUser || !selectedSite || status === 'saving' ? 'not-allowed' : 'pointer',
+          fontWeight: 'bold',
+          fontSize: '14px',
+          border: 'none',
+          background:
+            !selectedUser || !selectedSite || status === 'saving'
+              ? '#3a3a3a'
+              : 'linear-gradient(135deg, #4a4a4a 0%, #1a1a1a 100%)',
+          color: !selectedUser || !selectedSite || status === 'saving' ? '#888' : '#ffffff',
+          transition: 'opacity 0.2s',
+        }}
+      >
+        {status === 'saving' ? 'Assigning...' : 'Assign Company'}
+      </button>
+
+      {message && (
+        <div style={{ opacity: 0.85, fontSize: '13px', color: status === 'error' ? '#ff8a8a' : '#8affa0' }}>
+          {message}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AssignSiteWidgetIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="3" y="7" width="18" height="13" rx="2" />
+      <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <path d="M3 12h18" />
+    </svg>
+  );
+}
+
 if (typeof document !== 'undefined') {
   forceDarkColorScheme();
   injectCustomStyles();
@@ -427,6 +552,17 @@ export default {
       },
       component: async () => PublishedByWidget,
       id: 'naqsh-published-by',
+      pluginId: 'naqsh-customizations',
+    });
+
+    app.widgets.register({
+      icon: AssignSiteWidgetIcon,
+      title: {
+        id: 'naqsh-customizations.widget.assign-site.title',
+        defaultMessage: 'Assign Employee Company',
+      },
+      component: async () => AssignSiteWidget,
+      id: 'naqsh-assign-site',
       pluginId: 'naqsh-customizations',
     });
   },

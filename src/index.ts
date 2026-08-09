@@ -1,8 +1,78 @@
 import type { Core } from '@strapi/strapi';
 import jwt from 'jsonwebtoken';
 
+// خريطة preferedLanguage → رقم فولدر مكتبة الوسائط لكل شركة
+const SITE_TO_MEDIA_FOLDER: Record<string, number> = {
+  burooj_home: 2,
+  air_home: 4,
+  naqsh_home: 3,
+  ec_home: 5,
+  '6D_home': 1,
+};
+
+// نفس القيم المسموحة تُستخدم أيضًا عند تعيين شركة لموظف عبر الودجت
+const VALID_SITE_VALUES = Object.keys(SITE_TO_MEDIA_FOLDER);
+
 export default {
-  register(/* { strapi }: { strapi: Core.Strapi } */) {},
+  register({ strapi }: { strapi: Core.Strapi }) {
+    // route مخصص: تعيين preferedLanguage (شركة) لأي مستخدم أدمن - سوبر أدمن بس يقدر يستخدمه
+    strapi.server.routes([
+      {
+        method: 'POST',
+        path: '/naqsh/assign-site',
+        handler: async (ctx) => {
+          try {
+            const authHeader = ctx.request.header.authorization;
+            const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+
+            if (!token) {
+              return ctx.unauthorized('Missing token');
+            }
+
+            const secret = strapi.config.get('admin.auth.secret') as string;
+            const payload = jwt.verify(token, secret) as any;
+            const requesterId = payload?.id ?? payload?.userId ?? payload?.sub;
+
+            const requester = await strapi.db.query('admin::user').findOne({
+              where: { id: requesterId },
+              populate: ['roles'],
+            });
+
+            const isSuperAdmin = requester?.roles?.some(
+              (r: any) => r.code === 'strapi-super-admin'
+            );
+
+            if (!requester || !isSuperAdmin) {
+              return ctx.forbidden('Super Admin only');
+            }
+
+            const { userId, site } = ctx.request.body as { userId?: number; site?: string };
+
+            if (!userId || !site) {
+              return ctx.badRequest('userId and site are required');
+            }
+
+            if (!VALID_SITE_VALUES.includes(site)) {
+              return ctx.badRequest(`site must be one of: ${VALID_SITE_VALUES.join(', ')}`);
+            }
+
+            await strapi.db.query('admin::user').update({
+              where: { id: userId },
+              data: { preferedLanguage: site },
+            });
+
+            ctx.body = { success: true };
+          } catch (err) {
+            strapi.log.error(`[assign-site] EXCEPTION: ${(err as Error).message}`);
+            ctx.internalServerError('Failed to assign site');
+          }
+        },
+        config: {
+          auth: false, // نتحقق يدويًا بالداخل عن طريق JWT (نفس أسلوب باقي الميدل وير)
+        },
+      },
+    ]);
+  },
 
   bootstrap({ strapi }: { strapi: Core.Strapi }) {
     strapi.log.info('✅ Bootstrap file loaded successfully');
@@ -58,6 +128,7 @@ export default {
       },
     });
 
+    // ميدل وير 1: فلترة صفحات Page حسب موقع المستخدم
     strapi.server.use(async (ctx, next) => {
       const isPageRequest = ctx.request.path.startsWith(
         '/content-manager/collection-types/api::page.page'
@@ -71,7 +142,6 @@ export default {
           if (token) {
             const secret = strapi.config.get('admin.auth.secret') as string;
             const payload = jwt.verify(token, secret) as any;
-            strapi.log.info(`[debug-mw] full payload: ${JSON.stringify(payload)}`);
 
             const userId = payload?.id ?? payload?.userId ?? payload?.sub;
 
@@ -81,33 +151,84 @@ export default {
                 populate: ['roles'],
               });
 
-              strapi.log.info(`[site-filter-koa] user: ${adminUser?.email}`);
-
               const isSuperAdmin = adminUser?.roles?.some(
                 (r: any) => r.code === 'strapi-super-admin'
               );
 
               if (adminUser && !isSuperAdmin && adminUser.preferedLanguage) {
-                strapi.log.info(`[site-filter-koa] preferedLanguage: ${adminUser.preferedLanguage}`);
-
                 const site = await strapi.db.query('api::site.site').findOne({
                   where: { slag: adminUser.preferedLanguage },
                 });
-
-                strapi.log.info(`[site-filter-koa] matched site: ${site?.id}`);
 
                 if (site) {
                   ctx.query.filters = {
                     ...((ctx.query.filters as object) || {}),
                     site: site.id,
                   };
-                  strapi.log.info(`[site-filter-koa] injected filter`);
                 }
               }
             }
           }
         } catch (err) {
-          strapi.log.error(`[debug-mw] EXCEPTION: ${(err as Error).message}`);
+          strapi.log.error(`[site-filter-koa] EXCEPTION: ${(err as Error).message}`);
+        }
+      }
+
+      await next();
+    });
+
+    // ميدل وير 2: فلترة مكتبة الوسائط (Media Library) حسب فولدر شركة المستخدم
+    strapi.server.use(async (ctx, next) => {
+      const isUploadRequest =
+        ctx.request.path.startsWith('/upload/files') ||
+        ctx.request.path.startsWith('/upload/folders');
+
+      if (isUploadRequest) {
+        try {
+          const authHeader = ctx.request.header.authorization;
+          const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+
+          if (token) {
+            const secret = strapi.config.get('admin.auth.secret') as string;
+            const payload = jwt.verify(token, secret) as any;
+            const userId = payload?.id ?? payload?.userId ?? payload?.sub;
+
+            if (userId) {
+              const adminUser = await strapi.db.query('admin::user').findOne({
+                where: { id: userId },
+                populate: ['roles'],
+              });
+
+              const isSuperAdmin = adminUser?.roles?.some(
+                (r: any) => r.code === 'strapi-super-admin'
+              );
+
+              if (adminUser && !isSuperAdmin && adminUser.preferedLanguage) {
+                const folderId = SITE_TO_MEDIA_FOLDER[adminUser.preferedLanguage];
+
+                if (folderId) {
+                  strapi.log.info(`[media-filter] user ${adminUser.email} → folder ${folderId}`);
+
+                  if (ctx.request.path.startsWith('/upload/files')) {
+                    ctx.query.folder = String(folderId);
+                    ctx.query.filters = {
+                      ...((ctx.query.filters as object) || {}),
+                      folderPath: { $startsWith: `/${folderId}` },
+                    };
+                  }
+
+                  if (ctx.request.path.startsWith('/upload/folders')) {
+                    ctx.query.filters = {
+                      ...((ctx.query.filters as object) || {}),
+                      id: folderId,
+                    };
+                  }
+                }
+              }
+            }
+          }
+        } catch (err) {
+          strapi.log.error(`[media-filter] EXCEPTION: ${(err as Error).message}`);
         }
       }
 
