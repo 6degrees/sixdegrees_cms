@@ -453,12 +453,8 @@ function AssignSiteWidget() {
           fontWeight: 'bold',
           fontSize: '14px',
           border: 'none',
-          background:
-            !selectedUser || !selectedSite || status === 'saving'
-              ? '#3a3a3a'
-              : 'linear-gradient(135deg, #4a4a4a 0%, #1a1a1a 100%)',
+          background: !selectedUser || !selectedSite || status === 'saving' ? '#3a3a3a' : '#2d2d2d',
           color: !selectedUser || !selectedSite || status === 'saving' ? '#888' : '#ffffff',
-          transition: 'opacity 0.2s',
         }}
       >
         {status === 'saving' ? 'Assigning...' : 'Assign Company'}
