@@ -363,7 +363,7 @@ function AssignSiteWidget() {
   const [users, setUsers] = useState<any[]>([]);
   const [selectedUser, setSelectedUser] = useState('');
   const [selectedSite, setSelectedSite] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'saving' | 'done' | 'error'>('loading');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'saving' | 'done' | 'error' | 'unauthorized'>('loading');
   const [message, setMessage] = useState('');
 
   const SITE_OPTIONS = [
@@ -375,11 +375,21 @@ function AssignSiteWidget() {
   ];
 
   useEffect(() => {
-    get('/admin/users')
+    get('/admin/users/me')
       .then((res: any) => {
-        const results = res?.data?.data?.results || res?.data?.results || [];
-        setUsers(results);
-        setStatus('idle');
+        const me = res?.data?.data || res?.data;
+        const isSuperAdmin = me?.roles?.some((r: any) => r.code === 'strapi-super-admin');
+
+        if (!isSuperAdmin) {
+          setStatus('unauthorized');
+          return;
+        }
+
+        return get('/admin/users').then((usersRes: any) => {
+          const results = usersRes?.data?.data?.results || usersRes?.data?.results || [];
+          setUsers(results);
+          setStatus('idle');
+        });
       })
       .catch(() => setStatus('error'));
   }, []);
@@ -397,6 +407,10 @@ function AssignSiteWidget() {
       setMessage('Failed to assign. Check console/logs.');
     }
   };
+
+  if (status === 'unauthorized') {
+    return null;
+  }
 
   if (status === 'loading') {
     return <div style={{ padding: '16px', opacity: 0.7 }}>Loading...</div>;
