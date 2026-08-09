@@ -531,10 +531,10 @@ export default {
     head: {
       favicon: FaviconImage,
     },
-    // theme: {
-    //   light: darkTheme,
-    //   dark: darkTheme,
-    // },
+    theme: {
+      light: darkTheme,
+      dark: darkTheme,
+    },
     translations: {
       en: {
         'Auth.form.welcome.title': 'Naqsh Holding CMS',
