@@ -554,6 +554,7 @@ export default {
       name: 'Naqsh Customizations',
     });
 
+    /* --- تعطيل مؤقت للاختبار ---
     app.widgets.register({
       icon: PublishedByWidgetIcon,
       title: {
@@ -575,6 +576,7 @@ export default {
       id: 'naqsh-assign-site',
       pluginId: 'naqsh-customizations',
     });
+    --- نهاية التعطيل المؤقت --- */
   },
   bootstrap(app: StrapiApp) {
     console.log(app);
