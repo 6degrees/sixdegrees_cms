@@ -1,5 +1,6 @@
 import type { StrapiApp } from '@strapi/strapi/admin';
 import { useFetchClient } from '@strapi/strapi/admin';
+import { darkTheme } from '@strapi/design-system';
 import { useEffect, useState } from 'react';
 import Logo from './extensions/naqsh.png';
 import HeroBackground from './extensions/hero-background.png';
@@ -394,6 +395,10 @@ export default {
     },
     head: {
       favicon: FaviconImage,
+    },
+    theme: {
+      light: darkTheme,
+      dark: darkTheme,
     },
     translations: {
       en: {
