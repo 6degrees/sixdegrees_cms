@@ -24,7 +24,7 @@ export default {
           try {
             await strapi.plugin('email').service('email').send({
               to: freshUser.email,
-              subject: "You've Been Invited to Naqsh",
+              subject: "You've Been Invited to Naqsh Holding CMS",
               html: `
                 <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 30px; background-color: #f9f9f9; border-radius: 12px;">
                   <h2 style="color: #1a1a1a;">Welcome to Naqsh</h2>

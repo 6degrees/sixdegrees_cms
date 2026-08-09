@@ -1,4 +1,6 @@
 import type { StrapiApp } from '@strapi/strapi/admin';
+import { useFetchClient } from '@strapi/strapi/admin';
+import { useEffect, useState } from 'react';
 import Logo from './extensions/naqsh.png';
 import HeroBackground from './extensions/hero-background.png';
 import FaviconImage from './extensions/naqsh-favicon.png';
@@ -294,6 +296,67 @@ function forcePageListColumns() {
   }
 }
 
+type RecentPageEntry = {
+  id: number;
+  documentId: string;
+  title?: string;
+  publishedAt?: string;
+  updatedBy?: { firstname?: string; lastname?: string } | null;
+};
+
+function PublishedByWidget() {
+  const { get } = useFetchClient();
+  const [entries, setEntries] = useState<RecentPageEntry[]>([]);
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+
+  useEffect(() => {
+    get('/content-manager/collection-types/api::page.page?sort=publishedAt:desc&pageSize=5&status=published')
+      .then((res: any) => {
+        const results = res?.data?.results || res?.data?.data || [];
+        setEntries(results);
+        setStatus('ready');
+      })
+      .catch(() => setStatus('error'));
+  }, []);
+
+  if (status === 'loading') {
+    return <div style={{ padding: '16px', opacity: 0.7 }}>Loading...</div>;
+  }
+  if (status === 'error' || entries.length === 0) {
+    return <div style={{ padding: '16px', opacity: 0.7 }}>No data to display</div>;
+  }
+
+  return (
+    <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      {entries.map((entry) => {
+        const name = entry.updatedBy
+          ? `${entry.updatedBy.firstname || ''} ${entry.updatedBy.lastname || ''}`.trim()
+          : '';
+        return (
+          <div
+            key={entry.documentId || entry.id}
+            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+          >
+            <span>{entry.title || entry.documentId}</span>
+            <span style={{ opacity: 0.7, fontSize: '13px' }}>{name || 'Unknown'}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function PublishedByWidgetIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+
 if (typeof document !== 'undefined') {
   forceDarkColorScheme();
   injectCustomStyles();
@@ -337,8 +400,29 @@ export default {
         'Auth.form.welcome.title': 'Naqsh Holding CMS',
         'Auth.form.welcome.subtitle': 'Centralized management for all subsidiary sites',
         'app.components.LeftMenu.navbrand.title': 'Naqsh CMS',
+        'content-manager.containers.List.draft': 'Pending Review',
+        'content-manager.containers.edit.tabs.draft': 'pending review',
+        'content-manager.relation.publicationState.draft': 'Pending Review',
+        'content-manager.components.Select.draft-info-title': 'Pending Review',
       },
     },
+  },
+  register(app: StrapiApp) {
+    app.registerPlugin({
+      id: 'naqsh-customizations',
+      name: 'Naqsh Customizations',
+    });
+
+    app.widgets.register({
+      icon: PublishedByWidgetIcon,
+      title: {
+        id: 'naqsh-customizations.widget.published-by.title',
+        defaultMessage: 'Last Published + Publisher',
+      },
+      component: async () => PublishedByWidget,
+      id: 'naqsh-published-by',
+      pluginId: 'naqsh-customizations',
+    });
   },
   bootstrap(app: StrapiApp) {
     console.log(app);
