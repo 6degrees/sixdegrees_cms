@@ -58,7 +58,7 @@ export default {
 
             await strapi.db.query('admin::user').update({
               where: { id: userId },
-              data: { preferedLanguage: site },
+              data: { username: site },
             });
 
             ctx.body = { success: true };
@@ -169,9 +169,9 @@ export default {
                 (r: any) => r.code === 'strapi-super-admin'
               );
 
-              if (adminUser && !isSuperAdmin && adminUser.preferedLanguage) {
+              if (adminUser && !isSuperAdmin && adminUser.username) {
                 const site = await strapi.db.query('api::site.site').findOne({
-                  where: { slag: adminUser.preferedLanguage },
+                  where: { slag: adminUser.username },
                 });
 
                 if (site) {
@@ -217,8 +217,8 @@ export default {
                 (r: any) => r.code === 'strapi-super-admin'
               );
 
-              if (adminUser && !isSuperAdmin && adminUser.preferedLanguage) {
-                const folderId = SITE_TO_MEDIA_FOLDER[adminUser.preferedLanguage];
+              if (adminUser && !isSuperAdmin && adminUser.username) {
+                const folderId = SITE_TO_MEDIA_FOLDER[adminUser.username];
 
                 if (folderId) {
                   strapi.log.info(`[media-filter] user ${adminUser.email} → folder ${folderId}`);
