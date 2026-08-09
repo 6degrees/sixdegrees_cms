@@ -401,6 +401,7 @@ export default {
         'Auth.form.welcome.subtitle': 'Centralized management for all subsidiary sites',
         'app.components.LeftMenu.navbrand.title': 'Naqsh CMS',
         'content-manager.containers.List.draft': 'Pending Review',
+        'content-manager.containers.List.modified': 'Pending Review',
         'content-manager.containers.edit.tabs.draft': 'pending review',
         'content-manager.relation.publicationState.draft': 'Pending Review',
         'content-manager.components.Select.draft-info-title': 'Pending Review',
