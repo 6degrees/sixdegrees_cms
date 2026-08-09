@@ -327,7 +327,7 @@ function PublishedByWidget() {
   }
 
   return (
-    <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+    <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
       {entries.map((entry) => {
         const name = entry.updatedBy
           ? `${entry.updatedBy.firstname || ''} ${entry.updatedBy.lastname || ''}`.trim()
@@ -335,10 +335,10 @@ function PublishedByWidget() {
         return (
           <div
             key={entry.documentId || entry.id}
-            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '16px' }}
           >
             <span>{entry.title || entry.documentId}</span>
-            <span style={{ opacity: 0.7, fontSize: '13px' }}>{name || 'Unknown'}</span>
+            <span style={{ opacity: 0.8, fontSize: '15px' }}>{name || 'Unknown'}</span>
           </div>
         );
       })}
@@ -401,7 +401,7 @@ export default {
         'Auth.form.welcome.subtitle': 'Centralized management for all subsidiary sites',
         'app.components.LeftMenu.navbrand.title': 'Naqsh CMS',
         'content-manager.containers.List.draft': 'Pending Review',
-        'content-manager.containers.List.modified': 'Pending Review',
+        'content-manager.containers.List.modified': 'Pending Review (Updated)',
         'content-manager.containers.edit.tabs.draft': 'pending review',
         'content-manager.relation.publicationState.draft': 'Pending Review',
         'content-manager.components.Select.draft-info-title': 'Pending Review',
