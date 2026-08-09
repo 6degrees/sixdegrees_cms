@@ -367,11 +367,11 @@ function AssignSiteWidget() {
   const [message, setMessage] = useState('');
 
   const SITE_OPTIONS = [
-    { value: 'burooj_home', label: 'Burooj' },
-    { value: 'air_home', label: 'Burooj Air' },
-    { value: 'naqsh_home', label: 'Naqsh' },
-    { value: 'ec_home', label: 'Efficiency Center' },
-    { value: '6D_home', label: '6Degrees' },
+    { value: 'burooj', label: 'Burooj' },
+    { value: 'burooj-air', label: 'Burooj Air' },
+    { value: 'naqsh', label: 'Naqsh' },
+    { value: 'efficiency-center', label: 'Efficiency Center' },
+    { value: '6-degrees', label: '6Degrees' },
   ];
 
   useEffect(() => {

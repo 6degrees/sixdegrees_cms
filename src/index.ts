@@ -3,11 +3,11 @@ import jwt from 'jsonwebtoken';
 
 // خريطة preferedLanguage → رقم فولدر مكتبة الوسائط لكل شركة
 const SITE_TO_MEDIA_FOLDER: Record<string, number> = {
-  burooj_home: 2,
-  air_home: 4,
-  naqsh_home: 3,
-  ec_home: 5,
-  '6D_home': 1,
+  burooj: 2,
+  'burooj-air': 4,
+  naqsh: 3,
+  'efficiency-center': 5,
+  '6-degrees': 1,
 };
 
 // نفس القيم المسموحة تُستخدم أيضًا عند تعيين شركة لموظف عبر الودجت
