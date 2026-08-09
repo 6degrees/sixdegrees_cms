@@ -128,6 +128,20 @@ export default {
       },
     });
 
+    // يمنع المتصفح من عمل كاش لصفحة index.html نفسها (يحل مشكلة الصفحة البيضاء بعد أي نشر جديد)
+    strapi.server.use(async (ctx, next) => {
+      await next();
+
+      const path = ctx.request.path;
+      const isAdminShell = path === '/admin' || path.endsWith('/admin/') || path.endsWith('index.html');
+
+      if (isAdminShell) {
+        ctx.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+        ctx.set('Pragma', 'no-cache');
+        ctx.set('Expires', '0');
+      }
+    });
+
     // ميدل وير 1: فلترة صفحات Page حسب موقع المستخدم
     strapi.server.use(async (ctx, next) => {
       const isPageRequest = ctx.request.path.startsWith(
