@@ -523,22 +523,19 @@ async function loadUserSiteInfo() {
   fetchingUserSiteInfo = true;
   try {
     const token = getAuthToken();
-    console.log('[naqsh-filter] token found:', !!token);
     const res = await fetch('/admin/users/me', {
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       credentials: 'include',
     });
-    console.log('[naqsh-filter] /admin/users/me status:', res.status);
     if (!res.ok) return;
     const json = await res.json();
     const me = json?.data || json;
     const isSuperAdmin = !!me?.roles?.some((r: any) => r.code === 'strapi-super-admin');
     const username = me?.username as string | undefined;
     const allowedLabels = username && SITE_CATEGORY_LABELS[username] ? SITE_CATEGORY_LABELS[username] : [];
-    console.log('[naqsh-filter] username:', username, 'isSuperAdmin:', isSuperAdmin, 'allowedLabels:', allowedLabels);
     cachedUserSiteInfo = { isSuperAdmin, allowedLabels };
   } catch (e) {
-    console.log('[naqsh-filter] EXCEPTION:', e);
+    // تجاهل - لو فشل، ما نخفي شي (أفضل نعرض الكل بدل ما نخفي غلط)
   } finally {
     fetchingUserSiteInfo = false;
   }
