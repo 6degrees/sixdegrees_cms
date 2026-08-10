@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import Logo from './extensions/naqsh.png';
 import HeroBackground from './extensions/hero-background.png';
 import FaviconImage from './extensions/naqsh-favicon.png';
-import SixDegreesLogo from './extensions/6-Degrees2.png';
+import SixDegreesLogo from './extensions/logo.png';
 
 const customStyles = `
 body.naqsh-auth-page {
@@ -257,14 +257,14 @@ function injectPoweredByBadge() {
   const badge = document.createElement('div');
   badge.id = 'naqsh-powered-by';
   badge.style.position = 'fixed';
-  badge.style.bottom = '20px';
+  badge.style.bottom = '26px';
   badge.style.left = '20px';
   badge.style.display = 'flex';
   badge.style.flexDirection = 'row';
   badge.style.alignItems = 'center';
   badge.style.gap = '4px';
   badge.style.zIndex = '20';
-  badge.style.fontSize = '16px';
+  badge.style.fontSize = '18px';
   badge.style.color = 'rgba(255,255,255,0.6)';
   badge.innerHTML = `
     <span>Operated by</span>
@@ -613,7 +613,7 @@ export default {
     },
     translations: {
       en: {
-        'Auth.form.welcome.title': 'Naqsh Holding CMS',
+        'Auth.form.welcome.title': 'Naqsh Portal',
         'Auth.form.welcome.subtitle': 'Centralized management for all subsidiary sites',
         'app.components.LeftMenu.navbrand.title': 'Naqsh CMS',
         'content-manager.containers.List.draft': 'Pending Review',
