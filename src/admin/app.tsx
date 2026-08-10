@@ -510,24 +510,35 @@ const ALL_CATEGORY_LABELS = new Set(
 let cachedUserSiteInfo: { isSuperAdmin: boolean; allowedLabels: string[] } | null = null;
 let fetchingUserSiteInfo = false;
 
+function getAuthToken(): string | null {
+  const fromStorage = localStorage.getItem('jwtToken');
+  if (fromStorage) return fromStorage.replace(/^"|"$/g, '');
+  const match = document.cookie.match(/(?:^|;\s*)jwtToken=([^;]+)/);
+  if (match) return decodeURIComponent(match[1]);
+  return null;
+}
+
 async function loadUserSiteInfo() {
   if (cachedUserSiteInfo || fetchingUserSiteInfo) return;
   fetchingUserSiteInfo = true;
   try {
-    const token = localStorage.getItem('jwtToken');
+    const token = getAuthToken();
+    console.log('[naqsh-filter] token found:', !!token);
     const res = await fetch('/admin/users/me', {
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       credentials: 'include',
     });
+    console.log('[naqsh-filter] /admin/users/me status:', res.status);
     if (!res.ok) return;
     const json = await res.json();
     const me = json?.data || json;
     const isSuperAdmin = !!me?.roles?.some((r: any) => r.code === 'strapi-super-admin');
     const username = me?.username as string | undefined;
     const allowedLabels = username && SITE_CATEGORY_LABELS[username] ? SITE_CATEGORY_LABELS[username] : [];
+    console.log('[naqsh-filter] username:', username, 'isSuperAdmin:', isSuperAdmin, 'allowedLabels:', allowedLabels);
     cachedUserSiteInfo = { isSuperAdmin, allowedLabels };
   } catch (e) {
-    // تجاهل - لو فشل، ما نخفي شي (أفضل نعرض الكل بدل ما نخفي غلط)
+    console.log('[naqsh-filter] EXCEPTION:', e);
   } finally {
     fetchingUserSiteInfo = false;
   }
