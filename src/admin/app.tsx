@@ -493,6 +493,72 @@ function AssignSiteWidgetIcon() {
   );
 }
 
+// خريطة username (شركة المستخدم) → الأسماء المحتملة لفئتها بنافذة "Pick one component"
+const SITE_CATEGORY_LABELS: Record<string, string[]> = {
+  burooj: ['burooj'],
+  'burooj-air': ['air', 'burooj air', 'burooj-air'],
+  naqsh: ['naqsh'],
+  'efficiency-center': ['ec', 'efficiency', 'efficiency center'],
+  '6-degrees': ['sections'],
+};
+
+// كل الأسماء الممكنة لكل الفئات (نستخدمها لتحديد أي عنصر نص هو "اسم فئة" أصلاً)
+const ALL_CATEGORY_LABELS = new Set(
+  Object.values(SITE_CATEGORY_LABELS).flat()
+);
+
+let cachedUserSiteInfo: { isSuperAdmin: boolean; allowedLabels: string[] } | null = null;
+let fetchingUserSiteInfo = false;
+
+async function loadUserSiteInfo() {
+  if (cachedUserSiteInfo || fetchingUserSiteInfo) return;
+  fetchingUserSiteInfo = true;
+  try {
+    const token = localStorage.getItem('jwtToken');
+    const res = await fetch('/admin/users/me', {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      credentials: 'include',
+    });
+    if (!res.ok) return;
+    const json = await res.json();
+    const me = json?.data || json;
+    const isSuperAdmin = !!me?.roles?.some((r: any) => r.code === 'strapi-super-admin');
+    const username = me?.username as string | undefined;
+    const allowedLabels = username && SITE_CATEGORY_LABELS[username] ? SITE_CATEGORY_LABELS[username] : [];
+    cachedUserSiteInfo = { isSuperAdmin, allowedLabels };
+  } catch (e) {
+    // تجاهل - لو فشل، ما نخفي شي (أفضل نعرض الكل بدل ما نخفي غلط)
+  } finally {
+    fetchingUserSiteInfo = false;
+  }
+}
+
+function filterComponentCategories() {
+  if (!cachedUserSiteInfo || cachedUserSiteInfo.isSuperAdmin) return; // سوبر أدمن يشوف الكل
+  const { allowedLabels } = cachedUserSiteInfo;
+  if (allowedLabels.length === 0) return; // ما عرفنا شركته - ما نخفي شي احتياطًا
+
+  const allElements = document.querySelectorAll('button, div, span');
+  allElements.forEach((el) => {
+    const text = el.textContent?.trim().toLowerCase() || '';
+    if (!text || el.children.length > 0) return; // نبي عنصر نص طرفي بس (مو حاوي عناصر ثانية)
+    if (!ALL_CATEGORY_LABELS.has(text)) return;
+
+    const isAllowed = allowedLabels.includes(text);
+    if (isAllowed) return;
+
+    // نطلع لأقرب صف قابل للنقر (button) نخفيه، أو لين 4 مستويات كحد أقصى
+    let row: HTMLElement | null = el as HTMLElement;
+    for (let i = 0; i < 4 && row; i++) {
+      if (row.tagName === 'BUTTON' || row.getAttribute('role') === 'button') break;
+      row = row.parentElement;
+    }
+    if (row) {
+      row.style.display = 'none';
+    }
+  });
+}
+
 if (typeof document !== 'undefined') {
   forceDarkColorScheme();
   injectCustomStyles();
@@ -505,6 +571,7 @@ if (typeof document !== 'undefined') {
   hideSubtitleText();
   positionAuthPageLinks();
   forcePageListColumns();
+  loadUserSiteInfo();
   setTimeout(positionAuthPageLinks, 300);
   setTimeout(positionAuthPageLinks, 800);
   window.addEventListener('resize', positionAuthPageLinks);
@@ -514,6 +581,7 @@ if (typeof document !== 'undefined') {
     hideSubtitleText();
     positionAuthPageLinks();
     forcePageListColumns();
+    filterComponentCategories();
   });
   observer.observe(document.body, { childList: true, subtree: true });
 
