@@ -6,12 +6,7 @@ const config = ({env}: Core.Config.Shared.ConfigParams): Core.Config.Server => (
     url: env('PUBLIC_URL'),
     app: {
         keys: env.array('APP_KEYS')!,
-    },
-    transfer: {
-        remote: {
-            enabled: true,
-        },
-    },
+    }
 });
 
 export default config;
