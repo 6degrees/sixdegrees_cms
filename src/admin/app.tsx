@@ -601,19 +601,28 @@ async function loadUserSiteInfo() {
   }
 }
 
+// مكوّنات مشتركة مو تابعة لفئة شركة معينة - تنخفي لأي حد مو سوبر أدمن بغض النظر عن شركته
+const UNSCOPED_HIDE_LABELS = new Set(['project']);
+
 function filterComponentCategories() {
   if (!cachedUserSiteInfo || cachedUserSiteInfo.isSuperAdmin) return; // سوبر أدمن يشوف الكل
   const { allowedLabels } = cachedUserSiteInfo;
-  if (allowedLabels.length === 0) return; // ما عرفنا شركته - ما نخفي شي احتياطًا
+  const knowsCompany = allowedLabels.length > 0;
 
   const allElements = document.querySelectorAll('button, div, span');
   allElements.forEach((el) => {
     const text = el.textContent?.trim().toLowerCase() || '';
     if (!text || el.children.length > 0) return; // نبي عنصر نص طرفي بس (مو حاوي عناصر ثانية)
-    if (!ALL_CATEGORY_LABELS.has(text)) return;
 
-    const isAllowed = allowedLabels.includes(text);
-    if (isAllowed) return;
+    const isCategoryLabel = ALL_CATEGORY_LABELS.has(text);
+    const isUnscoped = UNSCOPED_HIDE_LABELS.has(text);
+    if (!isCategoryLabel && !isUnscoped) return;
+
+    if (isCategoryLabel) {
+      if (!knowsCompany) return; // ما عرفنا شركته - ما نخفي فئات الشركات احتياطًا
+      if (allowedLabels.includes(text)) return; // فئة شركته - تضل ظاهرة
+    }
+    // باقي الحالات: فئة شركة ثانية، أو مكوّن غير مصنّف (زي project) → نخفيه
 
     // نطلع لأقرب صف قابل للنقر (button) نخفيه، أو لين 4 مستويات كحد أقصى
     let row: HTMLElement | null = el as HTMLElement;
