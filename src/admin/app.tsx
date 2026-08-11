@@ -616,6 +616,7 @@ export default {
         'Auth.form.welcome.title': 'Naqsh Portal',
         'Auth.form.welcome.subtitle': 'Centralized management for all subsidiary sites',
         'app.components.LeftMenu.navbrand.title': 'Naqsh CMS',
+        'Auth.form.email.placeholder': 'e.g. name@naqsh.com',
         'content-manager.containers.List.draft': 'Pending Review',
         'content-manager.containers.List.modified': 'Pending Review (Updated)',
         'content-manager.containers.edit.tabs.draft': 'pending review',
