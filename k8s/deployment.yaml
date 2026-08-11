@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: strapi-api
-  namespace: strapi-api
+  name: cms-strapi
+  namespace: cms-strapi
   labels:
-    app: strapi-api
+    app: cms-strapi
 
 spec:
   replicas: 1
 
   selector:
     matchLabels:
-      app: strapi-api
+      app: cms-strapi
 
   template:
     metadata:
       labels:
-        app: strapi-api
+        app: cms-strapi
 
     spec:
       imagePullSecrets:
@@ -25,7 +25,7 @@ spec:
       serviceAccountName: default
 
       containers:
-        - name: strapi-api
+        - name: cms-strapi
 
           image: ghcr.io/6degrees/sixdegrees_cms:latest
           imagePullPolicy: Always
