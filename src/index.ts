@@ -13,6 +13,15 @@ const SITE_TO_MEDIA_FOLDER: Record<string, number> = {
 // نفس القيم المسموحة تُستخدم أيضًا عند تعيين شركة لموظف عبر الودجت
 const VALID_SITE_VALUES = Object.keys(SITE_TO_MEDIA_FOLDER);
 
+// username ممكن يحمل شركة وحدة أو كذا شركة مفصولة بفاصلة - نحولها لمصفوفة نظيفة
+function parseUserSites(username?: string | null): string[] {
+  if (!username) return [];
+  return username
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 export default {
   register({ strapi }: { strapi: Core.Strapi }) {
     // route مخصص: تعيين preferedLanguage (شركة) لأي مستخدم أدمن - سوبر أدمن بس يقدر يستخدمه
@@ -46,19 +55,22 @@ export default {
               return ctx.forbidden('Super Admin only');
             }
 
-            const { userId, site } = ctx.request.body as { userId?: number; site?: string };
+            const { userId, sites } = ctx.request.body as { userId?: number; sites?: string[] };
 
-            if (!userId || !site) {
-              return ctx.badRequest('userId and site are required');
+            if (!userId || !Array.isArray(sites) || sites.length === 0) {
+              return ctx.badRequest('userId and a non-empty sites array are required');
             }
 
-            if (!VALID_SITE_VALUES.includes(site)) {
-              return ctx.badRequest(`site must be one of: ${VALID_SITE_VALUES.join(', ')}`);
+            const invalid = sites.filter((s) => !VALID_SITE_VALUES.includes(s));
+            if (invalid.length > 0) {
+              return ctx.badRequest(
+                `Invalid site(s): ${invalid.join(', ')}. Must be one of: ${VALID_SITE_VALUES.join(', ')}`
+              );
             }
 
             await strapi.db.query('admin::user').update({
               where: { id: userId },
-              data: { username: site },
+              data: { username: sites.join(',') },
             });
 
             ctx.body = { success: true };
@@ -170,14 +182,15 @@ export default {
               );
 
               if (adminUser && !isSuperAdmin && adminUser.username) {
-                const site = await strapi.db.query('api::site.site').findOne({
-                  where: { slag: adminUser.username },
+                const userSites = parseUserSites(adminUser.username);
+                const sites = await strapi.db.query('api::site.site').findMany({
+                  where: { slag: { $in: userSites } },
                 });
 
-                if (site) {
+                if (sites.length > 0) {
                   ctx.query.filters = {
                     ...((ctx.query.filters as object) || {}),
-                    site: site.id,
+                    site: { $in: sites.map((s: any) => s.id) },
                   };
                 }
               }
@@ -218,23 +231,29 @@ export default {
               );
 
               if (adminUser && !isSuperAdmin && adminUser.username) {
-                const folderId = SITE_TO_MEDIA_FOLDER[adminUser.username];
+                const userSites = parseUserSites(adminUser.username);
+                const folderIds = userSites
+                  .map((site) => SITE_TO_MEDIA_FOLDER[site])
+                  .filter((id): id is number => !!id);
 
-                if (folderId) {
-                  strapi.log.info(`[media-filter] user ${adminUser.email} → folder ${folderId}`);
+                if (folderIds.length > 0) {
+                  strapi.log.info(`[media-filter] user ${adminUser.email} → folders ${folderIds.join(',')}`);
 
                   if (ctx.request.path.startsWith('/upload/files')) {
-                    ctx.query.folder = String(folderId);
+                    // لو فولدر وحد بس، نجبر التنقل التلقائي له (نفس السلوك القديم)
+                    if (folderIds.length === 1) {
+                      ctx.query.folder = String(folderIds[0]);
+                    }
                     ctx.query.filters = {
                       ...((ctx.query.filters as object) || {}),
-                      folderPath: { $startsWith: `/${folderId}` },
+                      $or: folderIds.map((id) => ({ folderPath: { $startsWith: `/${id}` } })),
                     };
                   }
 
                   if (ctx.request.path.startsWith('/upload/folders')) {
                     ctx.query.filters = {
                       ...((ctx.query.filters as object) || {}),
-                      id: folderId,
+                      id: { $in: folderIds },
                     };
                   }
                 }

@@ -362,7 +362,7 @@ function AssignSiteWidget() {
   const { get, post } = useFetchClient();
   const [users, setUsers] = useState<any[]>([]);
   const [selectedUser, setSelectedUser] = useState('');
-  const [selectedSite, setSelectedSite] = useState('');
+  const [selectedSites, setSelectedSites] = useState<string[]>([]);
   const [status, setStatus] = useState<'idle' | 'loading' | 'saving' | 'done' | 'error' | 'unauthorized'>('loading');
   const [message, setMessage] = useState('');
 
@@ -394,14 +394,20 @@ function AssignSiteWidget() {
       .catch(() => setStatus('error'));
   }, []);
 
+  const toggleSite = (value: string) => {
+    setSelectedSites((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    );
+  };
+
   const handleAssign = async () => {
-    if (!selectedUser || !selectedSite) return;
+    if (!selectedUser || selectedSites.length === 0) return;
     setStatus('saving');
     setMessage('');
     try {
-      await post('/naqsh/assign-site', { userId: Number(selectedUser), site: selectedSite });
+      await post('/naqsh/assign-site', { userId: Number(selectedUser), sites: selectedSites });
       setStatus('done');
-      setMessage('Assigned successfully.');
+      setMessage(`Assigned to: ${selectedSites.join(', ')}`);
     } catch (err) {
       setStatus('error');
       setMessage('Failed to assign. Check console/logs.');
@@ -444,31 +450,76 @@ function AssignSiteWidget() {
         ))}
       </select>
 
-      <select
-        value={selectedSite}
-        onChange={(e) => setSelectedSite(e.target.value)}
-        style={selectStyle}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+        }}
       >
-        <option value="">Select company...</option>
-        {SITE_OPTIONS.map((s) => (
-          <option key={s.value} value={s.value}>
-            {s.label}
-          </option>
-        ))}
-      </select>
+        <div style={{ opacity: 0.6, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          Company (select one or more)
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+          {SITE_OPTIONS.map((s) => {
+            const isSelected = selectedSites.includes(s.value);
+            return (
+              <button
+                key={s.value}
+                type="button"
+                onClick={() => toggleSite(s.value)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 14px',
+                  borderRadius: '999px',
+                  border: isSelected ? '1px solid #a5a5ff' : '1px solid #444',
+                  background: isSelected ? 'rgba(165, 165, 255, 0.15)' : '#2d2d2d',
+                  color: isSelected ? '#c8c8ff' : '#ffffff',
+                  fontSize: '13px',
+                  fontWeight: isSelected ? 700 : 400,
+                  cursor: 'pointer',
+                }}
+              >
+                <span
+                  style={{
+                    width: '14px',
+                    height: '14px',
+                    borderRadius: '4px',
+                    border: isSelected ? 'none' : '1px solid #666',
+                    background: isSelected ? '#a5a5ff' : 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  {isSelected && (
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="4">
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  )}
+                </span>
+                {s.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       <button
         onClick={handleAssign}
-        disabled={!selectedUser || !selectedSite || status === 'saving'}
+        disabled={!selectedUser || selectedSites.length === 0 || status === 'saving'}
         style={{
           padding: '12px',
           borderRadius: '8px',
-          cursor: !selectedUser || !selectedSite || status === 'saving' ? 'not-allowed' : 'pointer',
+          cursor: !selectedUser || selectedSites.length === 0 || status === 'saving' ? 'not-allowed' : 'pointer',
           fontWeight: 'bold',
           fontSize: '14px',
           border: 'none',
-          background: !selectedUser || !selectedSite || status === 'saving' ? '#3a3a3a' : '#2d2d2d',
-          color: !selectedUser || !selectedSite || status === 'saving' ? '#888' : '#ffffff',
+          background: !selectedUser || selectedSites.length === 0 || status === 'saving' ? '#3a3a3a' : '#2d2d2d',
+          color: !selectedUser || selectedSites.length === 0 || status === 'saving' ? '#888' : '#ffffff',
         }}
       >
         {status === 'saving' ? 'Assigning...' : 'Assign Company'}
@@ -493,7 +544,7 @@ function AssignSiteWidgetIcon() {
   );
 }
 
-// خريطة username (شركة المستخدم) → الأسماء المحتملة لفئتها بنافذة "Pick one component"
+// خريطة site slug (شركة) → الأسماء المحتملة لفئتها بنافذة "Pick one component"
 const SITE_CATEGORY_LABELS: Record<string, string[]> = {
   burooj: ['burooj'],
   'burooj-air': ['air', 'burooj air', 'burooj-air'],
@@ -506,6 +557,15 @@ const SITE_CATEGORY_LABELS: Record<string, string[]> = {
 const ALL_CATEGORY_LABELS = new Set(
   Object.values(SITE_CATEGORY_LABELS).flat()
 );
+
+// يحوّل قيمة username (ممكن تكون شركة وحدة أو كذا شركة مفصولة بفاصلة) لقائمة نظيفة
+function parseUserSites(username?: string | null): string[] {
+  if (!username) return [];
+  return username
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
 
 let cachedUserSiteInfo: { isSuperAdmin: boolean; allowedLabels: string[] } | null = null;
 let fetchingUserSiteInfo = false;
@@ -531,8 +591,8 @@ async function loadUserSiteInfo() {
     const json = await res.json();
     const me = json?.data || json;
     const isSuperAdmin = !!me?.roles?.some((r: any) => r.code === 'strapi-super-admin');
-    const username = me?.username as string | undefined;
-    const allowedLabels = username && SITE_CATEGORY_LABELS[username] ? SITE_CATEGORY_LABELS[username] : [];
+    const sites = parseUserSites(me?.username);
+    const allowedLabels = sites.flatMap((site) => SITE_CATEGORY_LABELS[site] || []);
     cachedUserSiteInfo = { isSuperAdmin, allowedLabels };
   } catch (e) {
     // تجاهل - لو فشل، ما نخفي شي (أفضل نعرض الكل بدل ما نخفي غلط)
