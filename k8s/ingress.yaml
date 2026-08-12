@@ -1,20 +1,23 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: strapi-api-ingress
-  namespace: strapi-api
+  name: cms-strapi-ingress
+  namespace: cms-strapi
   annotations:
     cert-manager.io/cluster-issuer: http01-clusterissuer
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "3600"
 spec:
   ingressClassName: nginx
 
   tls:
     - hosts:
         - strapi.6d.com.sa
-      secretName: strapi-api-tls
+      secretName: cms-strapi-tls
 
   rules:
     - host: strapi.6d.com.sa
@@ -24,6 +27,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: strapi-api-svc
+                name: cms-strapi-svc
                 port:
                   number: 1337
