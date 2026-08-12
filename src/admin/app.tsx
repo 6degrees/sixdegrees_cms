@@ -302,6 +302,7 @@ type RecentPageEntry = {
   documentId: string;
   title?: string;
   publishedAt?: string;
+  site?: { name?: string } | null;
   updatedBy?: { firstname?: string; lastname?: string } | null;
 };
 
@@ -338,7 +339,7 @@ function PublishedByWidget() {
             key={entry.documentId || entry.id}
             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '16px' }}
           >
-            <span>{entry.title || entry.documentId}</span>
+            <span>{entry.site?.name || entry.title || entry.documentId}</span>
             <span style={{ opacity: 0.8, fontSize: '15px' }}>{name || 'Unknown'}</span>
           </div>
         );
