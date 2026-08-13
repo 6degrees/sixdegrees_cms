@@ -1,12 +1,12 @@
 import type { Core } from '@strapi/strapi';
 
-// خريطة slag الموقع (Site.slag) → رابط الفرونت إند الفعلي لكل شركة
+// خريطة slag الموقع (Site.slag) → رابط الفرونت إند الفعلي لكل شركة (نطاقات مخصصة)
 const SITE_PREVIEW_BASE: Record<string, string> = {
-  '6-degrees': 'https://6degrees.github.io/sixdegrees-frontend',
-  burooj: 'https://burooj-pro.github.io/burooj-frontend',
-  'burooj-air': 'https://burooj-pro.github.io/buroojair-frontend',
-  naqsh: 'https://naqsh-holding.github.io/naqsh-frontend',
-  'efficiency-center': 'https://efficiency-center.github.io/efficiency-center-frontend',
+  '6-degrees': 'https://6degrees.com.sa',
+  burooj: 'https://burooj.pro',
+  'burooj-air': 'https://buroojair.com',
+  naqsh: 'https://naqsh.com.sa',
+  'efficiency-center': 'https://efficiencys.com.sa',
 };
 
 const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Admin => ({
@@ -33,10 +33,11 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Admin => 
     enabled: true,
     config: {
       allowedOrigins: [
-        'https://6degrees.github.io',
-        'https://burooj-pro.github.io',
-        'https://naqsh-holding.github.io',
-        'https://efficiency-center.github.io',
+        'https://6degrees.com.sa',
+        'https://burooj.pro',
+        'https://buroojair.com',
+        'https://naqsh.com.sa',
+        'https://efficiencys.com.sa',
       ],
       async handler(uid: string, { documentId, locale, status }: any) {
         // بس صفحات (Page) عندها معاينة - أي نوع محتوى ثاني نرجع فاضي

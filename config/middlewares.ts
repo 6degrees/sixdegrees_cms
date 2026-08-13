@@ -40,7 +40,7 @@ const config: Core.Config.Middlewares = [
                 'http://localhost:3003',
                 'https://burooj.pro',
                 'https://buroojair.com',
-                'https://naqsh.com',
+                'https://naqsh.com.sa',
                 'https://6degrees.com.sa',
                 'https://efficiencys.com.sa',
                 'https://naqsh-holding.github.io',
