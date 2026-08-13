@@ -67,7 +67,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Admin => 
           status: status || 'draft',
         });
 
-        return `${base}${localeSegment}/preview?${params.toString()}`;
+        return `${base}${localeSegment}?${params.toString()}`;
       },
     },
   },
