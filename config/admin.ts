@@ -33,10 +33,10 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Admin => 
     enabled: true,
     config: {
       allowedOrigins: [
-        'https://6degrees.github.io',
-        'https://burooj-pro.github.io',
-        'https://naqsh-holding.github.io',
-        'https://efficiency-center.github.io',
+        'https://6degrees.com.sa',
+        'https://burooj.pro',
+        'https://naqsh.com.sa',
+        'https://efficiencys.com.sa',
       ],
       async handler(uid: string, { documentId, locale, status }: any) {
         // بس صفحات (Page) عندها معاينة - أي نوع محتوى ثاني نرجع فاضي
